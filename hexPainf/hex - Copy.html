@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Hexagons on canvas</title>
+</head>
+
+<body>
+
+  <canvas id="hexagonCanvas" width="460" height="400" style="border: 0; display: block; margin: 0 auto;">
+  </canvas>
+  <script type="text/javascript">
+
+    const canvas = document.getElementById('hexagonCanvas');
+
+    class A {
+      constructor(canvas, array) {
+        if (canvas.getContext) {
+          this.ctx = canvas.getContext('2d');
+          this.ctx.fillStyle = "#008000"; //8AA639
+          this.ctx.strokeStyle = "#333333";
+          this.ctx.lineWidth = 2;
+        }
+        this.array = array;
+        let qs = array.map(h => h.q);
+        let rs = array.map(h => h.r);
+
+        // рры борда, колво ячеек по оси q и по оси r
+        this.boardWidth = Math.max(...qs) - Math.min(...qs);
+        this.boardHeight = Math.max(...rs) - Math.min(...rs);
+        this.offset = { q: Math.min(...qs), r: Math.max(...rs) };
+
+        console.log(this.offset)
+      }
+
+      drawBoard(size = 40) {
+        if (size < 40 || size >= 120) {
+          return;
+        }
+        this.sideLength = size;
+
+        //рры прясоугольника для гекса
+        this.hexRect = { w: this.sideLength / 2, h: Math.sqrt(3) * this.sideLength / 2 };
+
+        let qs = this.array.map(h => h.q);
+        let rs = this.array.map(h => h.r);
+
+        // рры борда, колво ячеек по оси q и по оси r
+        this.boardWidth = Math.max(...qs) - Math.min(...qs);
+        this.boardHeight = Math.max(...rs) - Math.min(...rs);
+
+        canvas.width = this.ctx.width = 3 * this.boardWidth * this.hexRect.w + 6 * this.hexRect.w;
+        canvas.height = this.ctx.height = 2 * (this.boardHeight) * this.hexRect.h;
+
+        this.offset = { q: Math.min(...qs), r: Math.max(...rs) };
+        console.log(this.offset)
+
+
+        this.array.forEach(el => {
+          this.drawHexagon(el);
+        });
+      }
+
+      drawHexagon(el) {
+        const q = el.q - this.offset.q;
+        const r = this.offset.r - el.r;
+
+        const x = 6 * this.hexRect.w + 3 * this.hexRect.w * (q - 1);
+        const y = 2 * this.hexRect.h * (r - 1) + (q - this.offset.r) * this.hexRect.h;
+        //console.log(q, r)
+        //console.log(x, y)
+        this.ctx.beginPath();
+        this.ctx.moveTo(x - this.hexRect.w, y - this.hexRect.h);
+        this.ctx.lineTo(x + this.hexRect.w, y - this.hexRect.h);
+        this.ctx.lineTo(x + 2 * this.hexRect.w, y);
+        this.ctx.lineTo(x + this.hexRect.w, y + this.hexRect.h);
+        this.ctx.lineTo(x - this.hexRect.w, y + this.hexRect.h);
+        this.ctx.lineTo(x - 2 * this.hexRect.w, y);
+        this.ctx.closePath();
+
+        if (true) {
+          this.ctx.fillStyle = "#8AA639";
+          this.ctx.fill();
+        }
+        else this.ctx.stroke();
+      }
+    }
+    //const map = Array(859).fill().reduce((acc, val, i) => {acc[i+1] = {q:lib.data.seasonAdventure.list[3].map.cells[i*2], r: lib.data.seasonAdventure.list[3].map.cells[i*2+1]}; return acc}, {});
+    //const r = Object.values(lib.data.seasonAdventure.level).filter(s => s.season == 3).filter(s => s.clientData.graphics.tile != "hex_empty").map(el => ({...map[el.level], visible: el.clientData.graphics.visible[0], reward: el.steps.map(s => s.reward).flat()}))
+
+    //.steps.map(s => s.reward).flat()
+    //.clientData.graphics.tile
+    //.clientData.graphics.visible[0]
+
+
+    const r = [{ "q": 0, "r": 2 }, { "q": 0, "r": 3 }, { "q": 0, "r": 4 }, { "q": 0, "r": 5 }, { "q": 0, "r": 6 }, { "q": 0, "r": 7 }, { "q": 0, "r": 8 }, { "q": 0, "r": 9 }, { "q": 0, "r": 10 }, { "q": 1, "r": 0 }, { "q": 1, "r": 4 }, { "q": 1, "r": 5 }, { "q": 1, "r": 6 }, { "q": 1, "r": 8 }, { "q": 1, "r": 9 }, { "q": 2, "r": 0 }, { "q": 2, "r": 5 }, { "q": 2, "r": 6 }, { "q": 2, "r": 9 }, { "q": 3, "r": 0 }, { "q": 3, "r": 1 }, { "q": 3, "r": 5 }, { "q": 3, "r": 8 }, { "q": 3, "r": 9 }, { "q": 4, "r": 1 }, { "q": 4, "r": 3 }, { "q": 4, "r": 4 }, { "q": 4, "r": 5 }, { "q": 4, "r": 6 }, { "q": 4, "r": 8 }, { "q": 4, "r": 9 }, { "q": 4, "r": 11 }, { "q": 4, "r": 12 }, { "q": 5, "r": 6 }, { "q": 5, "r": 7 }, { "q": 5, "r": 8 }, { "q": 5, "r": 9 }, { "q": 5, "r": 10 }, { "q": 5, "r": 11 }, { "q": 5, "r": 12 }, { "q": 6, "r": 4 }, { "q": 6, "r": 5 }, { "q": 6, "r": 7 }, { "q": 6, "r": 8 }, { "q": 6, "r": 9 }, { "q": 6, "r": 10 }, { "q": 6, "r": 11 }, { "q": 7, "r": 0 }, { "q": 7, "r": 1 }, { "q": 7, "r": 2 }, { "q": 7, "r": 3 }, { "q": 7, "r": 4 }, { "q": 7, "r": 5 }, { "q": 7, "r": 7 }, { "q": 7, "r": 10 }, { "q": 7, "r": 11 }, { "q": 7, "r": 12 }, { "q": 7, "r": 13 }, { "q": 8, "r": 1 }, { "q": 8, "r": 2 }, { "q": 8, "r": 3 }, { "q": 8, "r": 4 }, { "q": 8, "r": 5 }, { "q": 8, "r": 7 }, { "q": 8, "r": 8 }, { "q": 8, "r": 10 }, { "q": 8, "r": 14 }, { "q": 9, "r": 0 }, { "q": 9, "r": 3 }, { "q": 9, "r": 4 }, { "q": 9, "r": 8 }, { "q": 9, "r": 11 }, { "q": 9, "r": 13 }, { "q": 10, "r": 4 }, { "q": 10, "r": 6 }, { "q": 10, "r": 7 }, { "q": 10, "r": 9 }, { "q": 10, "r": 11 }, { "q": 10, "r": 14 }, { "q": 10, "r": 15 }, { "q": 11, "r": 6 }, { "q": 11, "r": 8 }, { "q": 11, "r": 9 }, { "q": 11, "r": 12 }, { "q": 11, "r": 13 }, { "q": 11, "r": 14 }, { "q": 11, "r": 15 }, { "q": 12, "r": 8 }, { "q": 12, "r": 9 }, { "q": 12, "r": 10 }, { "q": 12, "r": 14 }, { "q": 12, "r": 15 }, { "q": 13, "r": 11 }, { "q": 13, "r": 12 }, { "q": 13, "r": 13 }, { "q": 13, "r": 14 }, { "q": 1, "r": -1 }, { "q": 1, "r": -5 }, { "q": 1, "r": -6 }, { "q": 1, "r": -7 }, { "q": 1, "r": -8 }, { "q": 2, "r": -1 }, { "q": 2, "r": -2 }, { "q": 2, "r": -3 }, { "q": 2, "r": -4 }, { "q": 2, "r": -5 }, { "q": 2, "r": -6 }, { "q": 2, "r": -7 }, { "q": 2, "r": -11 }, { "q": 3, "r": -1 }, { "q": 3, "r": -2 }, { "q": 3, "r": -3 }, { "q": 3, "r": -9 }, { "q": 3, "r": -10 }, { "q": 4, "r": -1 }, { "q": 4, "r": -8 }, { "q": 4, "r": -9 }, { "q": 5, "r": -1 }, { "q": 5, "r": -2 }, { "q": 5, "r": -7 }, { "q": 5, "r": -8 }, { "q": 5, "r": -9 }, { "q": 6, "r": -1 }, { "q": 6, "r": -2 }, { "q": 6, "r": -3 }, { "q": 6, "r": -6 }, { "q": 6, "r": -7 }, { "q": 6, "r": -8 }, { "q": 7, "r": -1 }, { "q": 7, "r": -2 }, { "q": 7, "r": -3 }, { "q": 7, "r": -4 }, { "q": 7, "r": -5 }, { "q": 8, "r": -1 }, { "q": 8, "r": -2 }, { "q": 9, "r": -1 }, { "q": 10, "r": -1 }, { "q": 0, "r": -6 }, { "q": 0, "r": -7 }, { "q": 0, "r": -8 }, { "q": -1, "r": 0 }, { "q": -1, "r": -1 }, { "q": -1, "r": -2 }, { "q": -1, "r": -9 }, { "q": -2, "r": 0 }, { "q": -2, "r": -2 }, { "q": -2, "r": -3 }, { "q": -2, "r": -4 }, { "q": -2, "r": -10 }, { "q": -3, "r": 0 }, { "q": -3, "r": -2 }, { "q": -3, "r": -3 }, { "q": -3, "r": -4 }, { "q": -3, "r": -5 }, { "q": -3, "r": -9 }, { "q": -3, "r": -10 }, { "q": -3, "r": -11 }, { "q": -4, "r": -1 }, { "q": -4, "r": -4 }, { "q": -4, "r": -5 }, { "q": -4, "r": -10 }, { "q": -4, "r": -11 }, { "q": -5, "r": -6 }, { "q": -5, "r": -11 }, { "q": -6, "r": -5 }, { "q": -6, "r": -6 }, { "q": -6, "r": -7 }, { "q": -6, "r": -9 }, { "q": -6, "r": -11 }, { "q": -7, "r": 0 }, { "q": -7, "r": -4 }, { "q": -7, "r": -5 }, { "q": -7, "r": -6 }, { "q": -7, "r": -10 }, { "q": -7, "r": -11 }, { "q": -7, "r": -12 }, { "q": -8, "r": -1 }, { "q": -8, "r": -4 }, { "q": -8, "r": -5 }, { "q": -8, "r": -6 }, { "q": -8, "r": -7 }, { "q": -8, "r": -10 }, { "q": -8, "r": -11 }, { "q": -8, "r": -13 }, { "q": -9, "r": -2 }, { "q": -9, "r": -7 }, { "q": -9, "r": -8 }, { "q": -9, "r": -9 }, { "q": -9, "r": -10 }, { "q": -9, "r": -11 }, { "q": -9, "r": -12 }, { "q": -10, "r": -2 }, { "q": -10, "r": -7 }, { "q": -10, "r": -9 }, { "q": -10, "r": -10 }, { "q": -1, "r": 1 }, { "q": -1, "r": 4 }, { "q": -1, "r": 5 }, { "q": -1, "r": 8 }, { "q": -1, "r": 9 }, { "q": -2, "r": 4 }, { "q": -2, "r": 8 }, { "q": -2, "r": 9 }, { "q": -3, "r": 3 }, { "q": -3, "r": 4 }, { "q": -3, "r": 6 }, { "q": -3, "r": 7 }, { "q": -3, "r": 8 }, { "q": -3, "r": 9 }, { "q": -4, "r": 0 }, { "q": -4, "r": 1 }, { "q": -4, "r": 2 }, { "q": -4, "r": 3 }, { "q": -4, "r": 4 }, { "q": -4, "r": 8 }, { "q": -5, "r": 1 }, { "q": -5, "r": 3 }, { "q": -5, "r": 4 }, { "q": -5, "r": 6 }, { "q": -5, "r": 7 }, { "q": -5, "r": 8 }, { "q": -6, "r": 3 }, { "q": -6, "r": 5 }, { "q": -6, "r": 6 }, { "q": -6, "r": 7 }, { "q": -7, "r": 1 }, { "q": -7, "r": 2 }, { "q": -7, "r": 3 }, { "q": -7, "r": 5 }, { "q": -7, "r": 6 }, { "q": -8, "r": 1 }, { "q": -8, "r": 2 }, { "q": -8, "r": 5 }, { "q": -9, "r": 2 }, { "q": -9, "r": 4 }, { "q": -9, "r": 5 }, { "q": -10, "r": 1 }, { "q": -10, "r": 2 }, { "q": -10, "r": 3 }, { "q": -10, "r": 4 }, { "q": -10, "r": 5 }, { "q": -11, "r": 0 }, { "q": -11, "r": -1 }, { "q": -11, "r": -2 }, { "q": -11, "r": -3 }, { "q": -11, "r": -4 }, { "q": -11, "r": -5 }, { "q": -11, "r": -7 }, { "q": -11, "r": -12 }, { "q": -11, "r": -13 }, { "q": -12, "r": 1 }, { "q": -12, "r": 0 }, { "q": -12, "r": -1 }, { "q": -12, "r": -3 }, { "q": -12, "r": -4 }, { "q": -12, "r": -6 }];
+    /*
+    const r = [
+      {"q": 12,"r": 15},  // 24 0
+      {"q": 3,"r": -10},  // 15 25
+      {"q": -5,"r": -11}, // 7 26
+      {"q": -12,"r": 6}   // 0 9
+    ]
+    */
+    //const r = [{q:-3,r: 1},{q:-2,r:1},{q:-2,r:0},{q:-1,r:0},{q:-1,r:-1},{q:-1,r:-2},{q: 0,r:-1},{q:1,r:0},{q:0,r:1},{q:0,r:2}]
+    let a = new A(canvas, r)
+    a.drawBoard()
+
+    canvas.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      a.drawBoard(e.deltaY > 0 ? a.sideLength + 10 : a.sideLength - 10)
+    })
+  </script>
+</body>
+
+</html>
