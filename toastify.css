@@ -1,0 +1,71 @@
+:root {
+  --text-color-game: #FAE5B2; /* game */
+  --border-color-game: #CB985E;
+  --hr-color-game: #62450B;
+  --button-bg-color-game: #A07332;
+  --border-color-game: #D49B70;
+  --border-game: 2px;
+  --button-text-color-game: #FCE5B7;
+  --button-bg-color-green-game: #49AC20;
+  --border-color: #ce9767; /**/
+}
+
+.toastify2 {
+  position: absolute;
+  z-index: 10001;
+  top: -1px;
+  left: 30%;
+  cursor: pointer;
+  border-radius: 0px 0px 10px 10px;
+  background: #190e08e6;
+  border: 1px #ce9767 solid;
+  font-size: 18px;
+  font-family: sans-serif;
+  font-weight: 600;
+  font-stretch: condensed;
+  letter-spacing: 1px;
+  color: #fce1ac;
+  text-shadow: 0px 0px 1px;
+  transition: 0.5s;
+  padding: 2px 10px 3px;
+}
+
+.toastify {
+  position: fixed;
+  left: 50%;
+	top: 5px;
+	transform: translateX(-50%);
+  padding: 12px 20px;
+  color: #fce1ac;
+  border-radius: 10px 10px 10px 10px;
+  background: #190e08e6;
+  border: 1px #ce9767 solid;  
+  display: inline-block;
+  opacity: .65;
+  transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  max-width: calc(50% - 20px);
+  z-index: 2147483647;
+  max-width: fit-content;
+  /*animation: fadein 0.5s, fadeout 0.5s 2.5s;*/
+}
+
+@keyframes fadein {
+  from {opacity: 0;}
+  to {opacity: .65;}
+}
+
+@keyframes fadeout {
+  from {opacity: .65;}
+  to {opacity: 0;}
+}
+
+.toastify.success {
+  background: #1fae44;
+}
+
+.toastify.error {
+  background: #d5696f;
+}
