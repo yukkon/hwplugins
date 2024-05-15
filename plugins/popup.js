@@ -42,6 +42,8 @@ const injectFunction = () => {
 
     const levels = Object.values(lib.data.seasonAdventure.level).filter((s) => s.season == 3)
 
+    const processed = await Send(`{"calls":[{"name":"seasonAdventure_getMapState","args":{"seasonAdventureId": 3},"ident":"body"}]}`).then(r => r.results[0].result.response.levels).then(arr => arr.filter(l => l.steps.length > 0).reduce((acc, v) => {acc[v.id] = v.steps[0].isProcessed; return acc}, {}));
+
     const map = Array(levels.length)
       .fill()
       .reduce((acc, val, i) => {
@@ -55,6 +57,7 @@ const injectFunction = () => {
       .filter(s => s.clientData.graphics.tile != "hex_empty")
       .map(el => ({
         ...map[el.level],
+        processed: processed[el.level],
         tile: el.clientData.graphics.tile,
         visible: el.clientData.graphics.visible[0],
         reward: el.steps.map(s => Object.keys(s.reward).map(r => ({k:r, v:s.reward[r]}))).flat(),
@@ -200,17 +203,21 @@ class A {
 
   drawReward(x, y, el) {
     if (el?.tile === "tile_grass_1") {
-      this.ctx.fillStyle = "#8AA639";
+      if (el.processed) {
+        this.ctx.fillStyle = "#000000";
+      } else {
+        this.ctx.fillStyle = "#8AA639";
+      }
       this.ctx.fill();
 
       //let im = window.XX.cachedImages.get(`dialog_season_adventure_tiles.rsx/tile_grass_1_image`)
       //this.ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x-this.sideLength/2, y-this.sideLength/2, 2*this.sideLength, 2*this.sideLength);
-    } else this.ctx.stroke();
+    }
 
     if (el?.reward?.length > 0) {
       let i = 0;
       let c = el?.reward?.length;
-      let h = 1.4 * this.hexRect.h / c;
+      let h = 2.3 * this.hexRect.w; //люўій размер стороны под награды
 
       el.reward.forEach(({k:type, v}) => {
         let im, id, value, item, fragment = false;
@@ -238,8 +245,10 @@ class A {
           }
         }
         if (!!im) {
-          let rect = {x: x-h/2, y: y-h/2, w:h, h:Math.ceil(this.hexRect.w)+4};
-
+          let rect = {x: x-h/2+(i*h/c), y: y-h/(2*c), w:h/c, h:Math.ceil(this.hexRect.w/c)+4};
+          if (el.processed) {
+            this.ctx.filter = 'grayscale(1)';
+          }
           this.ctx.drawImage(
             im.image,
             im.x,
@@ -248,8 +257,8 @@ class A {
             im.height,
             rect.x,
             rect.y,
-            h,
-            h
+            rect.w,
+            rect.w
           );
 
           let b = XX.cachedImages.get(`dialog_basic.rsx/${lib.data.enum.itemColor[5].frameAssetTexture}`);
@@ -260,7 +269,7 @@ class A {
             }
             b = XX.cachedImages.get(`dialog_basic.rsx/${lib.data.enum.itemColor[item.color][a]}`);
           } 
-          this.ctx.drawImage(b.image, b.x, b.y, b.width, b.height, rect.x-4, rect.y-4, h+8, h+8);
+          this.ctx.drawImage(b.image, b.x, b.y, b.width, b.height, rect.x-4, rect.y-4, rect.w+8, rect.w+8);
 
           //this.ctx.fillStyle = '#160A02';
           //this.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
@@ -268,7 +277,9 @@ class A {
           this.ctx.font = `bold ${Math.ceil(this.hexRect.w)}px Sans Serif`;
           this.ctx.textAlign = "center";
           this.ctx.fillStyle = "#F2E84A";
-          this.ctx.fillText(value, rect.x+(rect.w/2), rect.y+2*rect.h);
+          let mm = Intl.NumberFormat('en-US', {notation: "compact", maximumFractionDigits: 2}).format(value);
+          this.ctx.fillText(mm, rect.x+(rect.w/2), rect.y+2*rect.h);
+          this.ctx.filter = 'none';
         }
         i++
       })
