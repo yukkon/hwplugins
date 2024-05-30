@@ -8,14 +8,14 @@
   },
   "content_scripts": [ {
     "js": [ "content.js" ],
-    "css": [ "./script.css", "./stats.css" ],
+    "css": [ "./main.css", "./script.css", "./stats.css" ],
     "matches": [ "https://www.hero-wars.com/*", "https://hero-wars.com/*" ],
-     "run_at": "document_idle"
+     "run_at": "document_end"
   }],
   "permissions": [ "scripting", "activeTab", "storage", "unlimitedStorage", "notifications", "contextMenus" ],
   "web_accessible_resources": [{
       "resources": [ "main.js", "plugins/*" ],
       "matches": [ "https://www.hero-wars.com/*", "https://hero-wars.com/*", "https://heroes-wb.nextersglobal.com/*" ],
-      "run_at": "document_idle"
+      "run_at": "document_end"
   }]
 }

@@ -20,8 +20,8 @@
 	/*position: absolute;*/
 	min-width: 750px;
 	max-width: 900px;
-	min-height: 620px;
-	max-height: 850px;
+	min-height: 50%px;
+	max-height: 80%;
 	background-color: #190e08e6;
 	z-index: 10001;
 	/*top: 169px;*/
@@ -42,6 +42,8 @@
 	color: #F9DEA5;
 	width: 100%;
 	top: 12px;
+
+	overflow: hidden;
 }
 .o::before {
 	content: "\2B24";
@@ -245,9 +247,6 @@ progress[value]::-moz-progress-bar {
 .tabber {
 	display: initial;
 }
-.wds-tabber {
-	overflow: hidden;
-}
 .wds-tabs__wrapper {
 	display: flex;
 	justify-content: center;
@@ -305,12 +304,6 @@ progress[value]::-moz-progress-bar {
 	display: none;
 	padding: 1em;
 }
-.wds-tab__content > div {
-	overflow: hidden;
-  max-height: 650px;
-	/*scrollbar-width: thin;*/
-	/*scrollbar-color: #463833 #362823;*/
-}
 .wds-tab__content.active {
 	display: block;
 }
@@ -318,29 +311,9 @@ progress[value]::-moz-progress-bar {
 	border-color: #544414;
 }
 
-.your-modal-dialog {
-	position: fixed;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
-}
-.your-modal-dialog2 {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.your-modal-dialog3 {
-  width: 100px;
-  height: 50px;
-  position:fixed; 
-  top: calc(50% - 25px); /* half of width */
-  left: calc(50% - 50px); /* half of height */
-}
-
 .pp_close {
 	--cross-color: #E7BF5D;
-  --bg-color: #492313;
+    --bg-color: #492313;
 	--border-color: #E7BF5D;
 	--oreol-color: #772118;
 	/*

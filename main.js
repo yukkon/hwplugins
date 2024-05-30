@@ -1,23 +1,50 @@
 "use strict";
 
-import {toast} from './plugins/toast.js';
-window.toast = toast;
+//import {toast} from './plugins/toast.js';
+//window.toast = toast;
 
-import myScript from "./plugins/my-script.js";
-myScript();
+//import myScript from "./plugins/my-script.js";
+//myScript();
 
-import "./plugins/hero_reits.js";
+//import "./plugins/hero_reits.js";
 //topPlugin();
 
-import "./plugins/raidMission.js";
+//import "./plugins/raidMission.js";
 
 import stats from "./plugins/stata.js";
-stats();
-
 import isl from "./plugins/popup.js";
-isl();
 
+// alternative to DOMContentLoaded
+document.onreadystatechange = function () {
+  if (document.readyState == "complete") {
+    console.info('load from main', document.readyState)
 
+    const init = () => {
+        const s = document.querySelector(".scriptMenu_main")
+        if (!s) {
+          setTimeout(init, 1000)
+        } else {
+          console.info('scriptMenu_main loaded')
+
+          const div = document.createElement("div");
+          div.className = "main_menu";
+          document.body.appendChild(div);
+
+          if (Object.values(lib?.data?.seasonAdventure?.list).length == 4) {
+            alert('Новый остров')
+          }
+
+          isl();
+          stats();
+        }
+    }
+    init();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  console.info('load from main', document.querySelector(".scriptMenu_main"))
+});
 
 //import ifu from "./plugins/test.js";
 //ifu();

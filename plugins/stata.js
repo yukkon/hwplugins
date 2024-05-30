@@ -29,7 +29,7 @@ const injectFunction = () => {
     raidStatistic();
   });
 
-  document.querySelector(".scriptMenu_main").appendChild(div);
+  document.querySelector(".main_menu").appendChild(div);
 };
 
 async function raidStatistic() {

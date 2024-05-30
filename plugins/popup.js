@@ -36,8 +36,6 @@ const injectFunction = () => {
       b.removeChild(container);
     });
 
-    document.querySelector(".scriptMenu_main").appendChild(div);
-
     const canvas = document.getElementById("hexagonCanvas");
 
     const levels = Object.values(lib.data.seasonAdventure.level).filter((s) => s.season == 3)
@@ -71,7 +69,11 @@ const injectFunction = () => {
 
     canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
-      a.drawBoard(e.deltaY > 0 ? a.sideLength + 10 : a.sideLength - 10);
+      if (!a.drawing) {
+        a.drawing = true;
+        a.drawBoard(e.deltaY > 0 ? a.sideLength + 10 : a.sideLength - 10);
+        a.drawing = false;
+      }
     });
 
     canvas.onmousedown = (e) => {
@@ -125,7 +127,7 @@ const injectFunction = () => {
     }
   });
 
-  document.querySelector(".scriptMenu_main").appendChild(div);
+  document.querySelector(".main_menu").appendChild(div);
 };
 
 class A {
@@ -294,8 +296,8 @@ class A {
             im.y,
             im.width,
             im.height,
-            x - 2 * this.hexRect.w,
-            y - this.hexRect.h,
+            x - 0.9 * this.sideLength,
+            y - 0.9 * this.sideLength,
             1.8 * this.sideLength,
             1.8 * this.sideLength
           );
