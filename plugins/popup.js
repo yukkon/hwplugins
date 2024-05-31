@@ -140,15 +140,7 @@ class A {
       this.ctx.lineWidth = 2;
     }
     this.array = array;
-    let qs = array.map((h) => h.q);
-    let rs = array.map((h) => h.r);
-
-    // рры борда, колво ячеек по оси q и по оси r
-    this.boardWidth = Math.max(...qs) - Math.min(...qs);
-    this.boardHeight = Math.max(...rs) - Math.min(...rs);
-    this.offset = { q: Math.min(...qs), r: Math.max(...rs) };
-
-    console.log(this.offset);
+    this.canvas = canvas;
   }
 
   drawBoard(size = 40) {
@@ -163,34 +155,31 @@ class A {
       h: (Math.sqrt(3) * this.sideLength) / 2,
     };
 
-    let qs = this.array.map((h) => h.q);
-    let rs = this.array.map((h) => h.r);
+    this.array = this.array.map(el => ({
+      ...el,
+      x: this.sideLength * 3/2 * el.q,
+      y: this.sideLength * (Math.sqrt(3)/2 * el.q - Math.sqrt(3) * el.r)
+    }))
 
-    // рры борда, колво ячеек по оси q и по оси r
-    this.boardWidth = Math.max(...qs) - Math.min(...qs);
-    this.boardHeight = Math.max(...rs) - Math.min(...rs);
+    let xs = this.array.map(el => el.x);
+    let ys = this.array.map(el => el.y);
 
-    this.canvas.width = this.ctx.width =
-      3 * this.boardWidth * this.hexRect.w + 6 * this.hexRect.w;
-    this.canvas.height = this.ctx.height =
-      2 * this.boardHeight * this.hexRect.h;
+    this.offset = { minx: Math.min(...xs), miny: Math.min(...ys), maxx: Math.max(...xs), maxy: Math.max(...ys) };
+    console.log('Офсет', this.offset)
 
-    this.offset = { q: Math.min(...qs), r: Math.max(...rs) };
-    console.log(this.offset);
+    this.canvas.width = this.ctx.width = 4 * this.hexRect.w + (this.offset.maxx - this.offset.minx);
+    this.canvas.height = this.ctx.height = 2 * this.hexRect.h + (this.offset.maxy - this.offset.miny);
 
     this.array.forEach((el) => {
       this.drawHexagon(el);
+      this.drawReward(el);
     });
   }
 
   drawHexagon(el) {
-    const q = el.q - this.offset.q;
-    const r = this.offset.r - el.r;
+    const x = el.x - this.offset.minx + 2*this.hexRect.w;
+    const y = el.y - this.offset.miny + this.hexRect.h;
 
-    const x = 6 * this.hexRect.w + 3 * this.hexRect.w * (q - 1);
-    const y = 2 * this.hexRect.h * (r - 1) + (q - this.offset.r) * this.hexRect.h;
-    //console.log(q, r);
-    //console.log(x, y);
     this.ctx.beginPath();
     this.ctx.moveTo(x - this.hexRect.w, y - this.hexRect.h);
     this.ctx.lineTo(x + this.hexRect.w, y - this.hexRect.h);
@@ -199,11 +188,12 @@ class A {
     this.ctx.lineTo(x - this.hexRect.w, y + this.hexRect.h);
     this.ctx.lineTo(x - 2 * this.hexRect.w, y);
     this.ctx.closePath();
-
-    this.drawReward(x, y, el);
   }
 
-  drawReward(x, y, el) {
+  drawReward(el) {
+    const x = el.x - this.offset.minx + 2*this.hexRect.w;
+    const y = el.y - this.offset.miny + this.hexRect.h;
+
     if (el?.tile === "tile_grass_1") {
       if (el.processed) {
         this.ctx.fillStyle = "#000000";

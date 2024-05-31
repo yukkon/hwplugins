@@ -1267,37 +1267,37 @@ class Drawer {
     // bg
     if (type == "hero") {
       k = this.map[type].background(data.color);
-      im = await this.#x.getImageFromCache(k);
+      im = await this.#x.cachedImages.get(k);
 
-      this.#ctx.drawImage(im, 6 + 105 * (i + add), 10, 80, 80);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * (i + add), 10, 80, 80);
     }
     // icon
     k = this.map[type].icon(data.id);
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 7 + 105 * (i + add), 12, 80, 80);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 7 + 105 * (i + add), 12, 80, 80);
     // border
     if (type == "hero") {
       k = this.map[type].border(data.color);
     } else {
       k = this.map[type].border(data.id, data.element);
     }
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 105 * (i + add), 4, 94, 94);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * (i + add), 4, 94, 94);
     // stars
     if (data.star == 6) {
-      im = await this.#x.getImageFromCache(this.map.absolute);
+      im = await this.#x.cachedImages.get(this.map.absolute);
       this.#ctx.drawImage(
-        im,
+        im.image, im.x, im.y, im.width, im.height,
         9 + 105 * (i + add),
         69,
         im.width + 10,
         im.height
       );
     } else {
-      im = await this.#x.getImageFromCache(this.map.star);
+      im = await this.#x.cachedImages.get(this.map.star);
       [...Array(data.star)].forEach((_, j) => {
         this.#ctx.drawImage(
-          im,
+          im.image, im.x, im.y, im.width, im.height,
           (94 - 17 * data.star) / 2 + 17 * j + 105 * (i + add),
           69,
           20,
@@ -1311,8 +1311,8 @@ class Drawer {
     } else {
       k = this.map.level_base;
     }
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 26 + 105 * (i + add), 2, 42, 28);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * (i + add), 2, 42, 28);
 
     // level
     this.#ctx.font = "bold 18px Arial";
@@ -1323,8 +1323,8 @@ class Drawer {
     // favor
     if (!!data.petId) {
       k = this.map.pet.small(data.petId);
-      im = await this.#x.getImageFromCache(k);
-      this.#ctx.drawImage(im, 68 + 105 * (i + add), 2, 35, 34);
+      im = await this.#x.cachedImages.get(k);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 68 + 105 * (i + add), 2, 35, 34);
     }
     // power
     this.#ctx.font = "bold 18px Arial";
@@ -1376,27 +1376,27 @@ class Drawer {
   async #drawPet(data, add) {
     // bg
     let k = this.map.pet.background(data.color);
-    let im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 4 + 105 * add, 9, 80, 80);
+    let im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 4 + 105 * add, 9, 80, 80);
     // icon
     k = this.map.pet.icon(data.id);
-    im = await this.#x.getImageFromCache(k);
+    im = await this.#x.cachedImages.get(k);
     if (!!im) {
-      this.#ctx.drawImage(im, 7 + 105 * add, 10, 80, 80);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 7 + 105 * add, 10, 80, 80);
     }
     // border
     k = this.map.pet.border(data.color);
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 105 * add, 4, 94, 94);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * add, 4, 94, 94);
     // stars
     if (data.star == 6) {
-      im = await this.#x.getImageFromCache(this.map.absolute);
-      this.#ctx.drawImage(im, 9 + 105 * add, 69, im.width + 10, im.height);
+      im = await this.#x.cachedImages.get(this.map.absolute);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * add, 69, im.width + 10, im.height);
     } else {
-      im = await this.#x.getImageFromCache(this.map.star);
+      im = await this.#x.cachedImages.get(this.map.star);
       [...Array(data.star)].forEach((_, j) => {
         this.#ctx.drawImage(
-          im,
+          im.image, im.x, im.y, im.width, im.height,
           20 + 105 * add + ((47 - 17 * data.star) / 2 + 17 * j),
           69,
           20,
@@ -1406,8 +1406,8 @@ class Drawer {
     }
     // level border
     k = this.map.level(data.color);
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 26 + 105 * add, 2, 42, 28);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * add, 2, 42, 28);
 
     // level
     this.#ctx.font = "bold 18px Arial";
@@ -1427,24 +1427,24 @@ class Drawer {
   async #drawSpirit(data, i) {
     // icon
     let k = this.map.spirit.icon(data.type);
-    let im = await this.#x.getImageFromCache(k);
+    let im = await this.#x.cachedImages.get(k);
 
     if (!!im) {
-      this.#ctx.drawImage(im, 9 + 105 * i, 12, 80, 80);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * i, 12, 80, 80);
     }
     // border
     k = this.map.spirit.border(data.level);
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 6 + 105 * i, 10, 90, 90);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * i, 10, 90, 90);
     // stars
     if (data.star == 6) {
-      im = await this.#x.getImageFromCache(this.map.absolute);
-      this.#ctx.drawImage(im, 18 + 105 * i, 69, im.width, im.height);
+      im = await this.#x.cachedImages.get(this.map.absolute);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 18 + 105 * i, 69, im.width, im.height);
     } else {
-      im = await this.#x.getImageFromCache(this.map.star);
+      im = await this.#x.cachedImages.get(this.map.star);
       [...Array(data.star)].forEach((_, j) => {
         this.#ctx.drawImage(
-          im,
+          im.image, im.x, im.y, im.width, im.height,
           105 * i + ((105 - 17 * data.star) / 2 + 17 * j),
           69,
           20,
@@ -1454,8 +1454,8 @@ class Drawer {
     }
     // level border
     k = this.map.spirit.level(data.level);
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 30 + 105 * i, 2, im.width, im.height);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 30 + 105 * i, 2, im.width, im.height);
     // level
     this.#ctx.fillText(data.level, 51 + 105 * i, 23);
   }
@@ -1463,15 +1463,15 @@ class Drawer {
   async #drawBanner(data) {
     // icon
     let k = this.map.banner.icon(data.id);
-    let im = await this.#x.getImageFromCache(k);
+    let im = await this.#x.cachedImages.get(k);
 
     if (!!im) {
-      this.#ctx.drawImage(im, 9, 12, 80, 80);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9, 12, 80, 80);
     }
     // border
     k = this.map.banner.border;
-    im = await this.#x.getImageFromCache(k);
-    this.#ctx.drawImage(im, 0, 4, 94, 94);
+    im = await this.#x.cachedImages.get(k);
+    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 0, 4, 94, 94);
 
     this.#drawStones(data.slots);
   }
@@ -1482,17 +1482,17 @@ class Drawer {
       const st = lib.data.inventoryItem.bannerStone[s];
       // icon
       let k = `banner_stone_icons.xml/${st.assetTexture}`;
-      let im = await this.#x.getImageFromCache(k);
+      let im = await this.#x.cachedImages.get(k);
 
       let x = c + 30 * i + (30 * (3 - c)) / (c + 1);
 
       if (!!im) {
-        this.#ctx.drawImage(im, x, 80, 30, 30);
+        this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x, 80, 30, 30);
       }
       // border
       k = this.map.stone.border(st.color);
-      im = await this.#x.getImageFromCache(k);
-      this.#ctx.drawImage(im, x, 80, 30, 30);
+      im = await this.#x.cachedImages.get(k);
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x, 80, 30, 30);
     });
   }
 }

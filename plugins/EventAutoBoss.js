@@ -36,7 +36,7 @@ const injectFunction = () => {
     });
 
     const a = new executeEventAutoBoss();
-    a.start({tries: 1000, pet: 6005, attackers: {"43": 6002,"50": 6001,"55": 6005,"58": 6008,"63": 6000}, effect: 120});
+    a.start({tries: 1000, attackers: {pet: 6005, attackers:{"43": 6002,"50": 6001,"55": 6005,"58": 6008,"63": 6000}}, effect: 120});
   })
   document.querySelector(".scriptMenu_main").appendChild(div);
 }
@@ -65,7 +65,7 @@ class executeEventAutoBoss {
       if (!Object.keys(attackers).includes(this.pool.mandatoryUnitId)) new Error("Нет обязательного героя")
       if (!Object.keys(attackers).every(id => this.aHeroes.includes(id))) new Error("Герой не доступен")
       if (!Object.values(attackers).every(id => !id || this.aPets.includes(id))) new Error("Питомец не доступен")
-      if (!!pet && !this.aPets.includes(pet)) new Error("Питомец не доступен")
+      if (!!attackers.pet && !this.aPets.includes(attackers.pet)) new Error("Питомец не доступен")
 
       this.combo = [attackers];
     } else {

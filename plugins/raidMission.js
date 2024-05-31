@@ -99,18 +99,18 @@ class Raid {
 				const b = window.XX.cachedImages.get(`dialog_basic.rsx/${lib.data.enum.itemColor[item.color].fragmentFrameAssetTexture}`);
 				ctx.drawImage(b.image, b.x, b.y, b.width, b.height, 56*i, 0, 56, 56);
 
-				ctx.font = "bold 14px Sans Serif";
-				ctx.textAlign = 'center';
+				ctx.font = "bold 16px Sans Serif";
+				ctx.textAlign = 'end';
 				const m = ctx.measureText(fragment[gk]).width;
 
-				ctx.fillStyle = '#160A02';
-				ctx.fillRect(54*(i+1)-m-12, 36, m+8, 13);
+				//ctx.fillStyle = '#160A02';
+				//ctx.fillRect(54*(i+1)-m-12, 36, m+8, 14);
 
-				ctx.font = "bold 14px Sans Serif";
-				ctx.textAlign = 'center';
+				ctx.font = "bold 16px Sans Serif";
+				ctx.textAlign = 'end';
+				ctx.textBaseline = "bottom";
 				ctx.fillStyle = '#F2E84A';
-        let k = [14,16,21][Math.ceil(m / 7)-1];
-				ctx.fillText(fragment[gk], 54*(i+1)-k, 48); 
+				ctx.fillText(fragment[gk], 54*(i+1)-4, 51); 
 
         i++;
 			})
