@@ -1,57 +1,142 @@
 "use strict";
 
 const injectFunction = () => {
-  const div = document.createElement("div");
-  div.className = "scriptMenu_button";
-  div.innerHTML = '<div class="scriptMenu_buttonText">Остров</div>';
-  div.addEventListener("click", async () => {
-    const b = document.querySelector(".PopUp_back");
+  
+  Object.values(lib.data.seasonAdventure.list).forEach(i => {
+    const div = document.createElement("div");
+    div.className = "menu_button";
+    div.innerHTML = `Остров ${i.id}`;
+    div.dataset.id = i.id;
+    div.addEventListener("click", onclick);
+    document.querySelector(".main_menu").appendChild(div);
+  })
+};
 
-    const r = b.querySelector(".PopUp_");
-    r.classList.add("PopUp_hideBlock");
+const onclick = async (e) => {
+  const b = document.querySelector(".PopUp_back");
 
-    const container = document.createElement("div");
-    container.className = "PopUpn_";
-    b.appendChild(container);
+  const r = b.querySelector(".PopUp_");
+  r.classList.add("PopUp_hideBlock");
 
-    // #region 
-    let g = document.createElement("canvas");
-		let ctx = g.getContext("2d")
+  const container = document.createElement("div");
+  container.className = "PopUpn_";
+  b.appendChild(container);
 
-    const x = XX.cachedImages.get(`dialog_season_adventure_tiles.rsx/bg_season_1400_box`);
-    ctx.drawImage(x.image, x.x, x.y, x.width, x.height, 0, 0, x.width, x.height);
-    let src = g.toDataURL();
-    // #endregion
+  // #region 
+  let g = document.createElement("canvas");
+  let ctx = g.getContext("2d")
 
-    container.innerHTML =
-      `<div style='background-image: url(${src});background-size:100% 100%; overflow:hidden;'><canvas class='dragme' id='hexagonCanvas' style='border: 1px solid black; position: relative;'></canvas></div>`;
+  const x = XX.cachedImages.get(`dialog_season_adventure_tiles.rsx/bg_season_1400_box`);
+  ctx.drawImage(x.image, x.x, x.y, x.width, x.height, 0, 0, x.width, x.height);
+  let src = g.toDataURL();
+  // #endregion
 
-    b.classList.remove("PopUp_hideBlock");
+  container.innerHTML =
+    `<div style='background-image: url(${src});background-size:100% 100%; overflow:hidden;'><canvas class='dragme' id='hexagonCanvas' style='border: 1px solid black; position: relative;'></canvas></div>`;
 
-    let button = document.createElement("div");
-    button.classList.add("pp_close");
-    container.append(button);
-    button.addEventListener("click", () => {
-      b.classList.add("PopUp_hideBlock");
-      b.removeChild(container);
-    });
+  b.classList.remove("PopUp_hideBlock");
 
-    const canvas = document.getElementById("hexagonCanvas");
+  let button = document.createElement("div");
+  button.classList.add("pp_close");
+  container.append(button);
+  button.addEventListener("click", () => {
+    b.classList.add("PopUp_hideBlock");
+    b.removeChild(container);
+  });
 
-    const levels = Object.values(lib.data.seasonAdventure.level).filter((s) => s.season == 3)
+  const id = Number(e.target.dataset.id);
+  const canvas = document.getElementById("hexagonCanvas");
+  const processed = await Send(`{"calls":[{"name":"seasonAdventure_getMapState","args":{"seasonAdventureId": ${id}},"ident":"body"}]}`).then(r => !r.error ? r.results[0].result.response.levels : []).then(arr => arr.filter(l => l.steps.length > 0).reduce((acc, v) => {acc[v.id] = v.steps[0].isProcessed; return acc}, {}));
 
-    const processed = await Send(`{"calls":[{"name":"seasonAdventure_getMapState","args":{"seasonAdventureId": 3},"ident":"body"}]}`).then(r => r.results[0].result.response.levels).then(arr => arr.filter(l => l.steps.length > 0).reduce((acc, v) => {acc[v.id] = v.steps[0].isProcessed; return acc}, {}));
+  //levels.filter(s => s.clientData.graphics.tile != "hex_empty")
+  //.map(l => l.steps.map(s => Object.keys(s.reward).map(r => ({k:r, v:s.reward[r]})))).flat()
 
+  let a = new A(canvas, id, processed);
+  a.drawBoard();
+
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    if (!a.drawing) {
+      a.drawing = true;
+      a.drawBoard(e.deltaY > 0 ? a.sideLength + 10 : a.sideLength - 10);
+      a.drawing = false;
+    }
+  });
+
+  canvas.onmousedown = (e) => {
+    var targ = e.target ? e.target : e.srcElement;
+  
+    if (targ.className != 'dragme') {
+      return
+    };
+    targ.style.cursor = 'move';
+  
+    // assign default values for top and left properties
+    if (!targ.style.left) {
+      targ.style.left = '0px'
+    };
+    if (!targ.style.top) {
+      targ.style.top = '0px'
+    };
+  
+    const offset = {x: e.clientX, y: e.clientY};
+    const coord = {x: parseInt(targ.style.left), y: parseInt(targ.style.top)}
+    window.drag = true;
+  
+    // move div element
+    document.onmousemove = (e) => { ((e, offset, coord) => {
+      if (!window.drag) {
+        return
+      };
+      if (!e) {
+        var e = window.event
+      };
+      var targ = e.target ? e.target : e.srcElement;
+      // move div element
+      targ.style.left = coord.x + e.clientX - offset.x + 'px';
+      targ.style.top = coord.y + e.clientY - offset.y + 'px';
+      return false;
+    })(e, offset, coord) };
+
+    e.stopPropagation();
+  };
+
+  canvas.onmouseup = (e) => {
+    (e.target ? e.target : e.srcElement).style.cursor = 'default';
+    window.drag = false;
+    e.stopPropagation();
+  };
+
+  canvas.onclick = (e) => { 
+    if (!window.drag) {
+      console.log(a)
+    }
+  }
+};
+
+class A {
+  constructor(canvas, id, processed) {
+    this.canvas = canvas;
+    if (canvas.getContext) {
+      this.ctx = canvas.getContext("2d");
+      this.ctx.fillStyle = "#008000"; //8AA639
+      this.ctx.strokeStyle = "#333333";
+      this.ctx.lineWidth = 2;
+    }
+    this.canvas = canvas;
+    
+    const island = lib.data.seasonAdventure.list[id];
+    const levels = Object.values(lib.data.seasonAdventure.level).filter((s) => s.season == id)
     const map = Array(levels.length)
       .fill()
       .reduce((acc, val, i) => {
         acc[i + 1] = {
-          q: lib.data.seasonAdventure.list[3].map.cells[i * 2],
-          r: lib.data.seasonAdventure.list[3].map.cells[i * 2 + 1],
+          q: island.map.cells[i * 2],
+          r: island.map.cells[i * 2 + 1],
         };
         return acc;
       }, {});
-    const ar = levels
+      this.array = levels
       .filter(s => s.clientData.graphics.tile != "hex_empty")
       .map(el => ({
         ...map[el.level],
@@ -60,87 +145,6 @@ const injectFunction = () => {
         visible: el.clientData.graphics.visible[0],
         reward: el.steps.map(s => Object.keys(s.reward).map(r => ({k:r, v:s.reward[r]}))).flat(),
       }));
-
-    //levels.filter(s => s.clientData.graphics.tile != "hex_empty")
-    //.map(l => l.steps.map(s => Object.keys(s.reward).map(r => ({k:r, v:s.reward[r]})))).flat()
-
-    let a = new A(canvas, ar);
-    a.drawBoard();
-
-    canvas.addEventListener("wheel", (e) => {
-      e.preventDefault();
-      if (!a.drawing) {
-        a.drawing = true;
-        a.drawBoard(e.deltaY > 0 ? a.sideLength + 10 : a.sideLength - 10);
-        a.drawing = false;
-      }
-    });
-
-    canvas.onmousedown = (e) => {
-      var targ = e.target ? e.target : e.srcElement;
-    
-      if (targ.className != 'dragme') {
-        return
-      };
-      targ.style.cursor = 'move';
-    
-      // assign default values for top and left properties
-      if (!targ.style.left) {
-        targ.style.left = '0px'
-      };
-      if (!targ.style.top) {
-        targ.style.top = '0px'
-      };
-    
-      const offset = {x: e.clientX, y: e.clientY};
-      const coord = {x: parseInt(targ.style.left), y: parseInt(targ.style.top)}
-      window.drag = true;
-    
-      // move div element
-      document.onmousemove = (e) => { ((e, offset, coord) => {
-        if (!window.drag) {
-          return
-        };
-        if (!e) {
-          var e = window.event
-        };
-        var targ = e.target ? e.target : e.srcElement;
-        // move div element
-        targ.style.left = coord.x + e.clientX - offset.x + 'px';
-        targ.style.top = coord.y + e.clientY - offset.y + 'px';
-        return false;
-      })(e, offset, coord) };
-
-      e.stopPropagation();
-    };
-
-    canvas.onmouseup = (e) => {
-      (e.target ? e.target : e.srcElement).style.cursor = 'default';
-      window.drag = false;
-      e.stopPropagation();
-    };
-
-    canvas.onclick = (e) => { 
-      if (!window.drag) {
-        console.log(a)
-      }
-    }
-  });
-
-  document.querySelector(".main_menu").appendChild(div);
-};
-
-class A {
-  constructor(canvas, array) {
-    this.canvas = canvas;
-    if (canvas.getContext) {
-      this.ctx = canvas.getContext("2d");
-      this.ctx.fillStyle = "#008000"; //8AA639
-      this.ctx.strokeStyle = "#333333";
-      this.ctx.lineWidth = 2;
-    }
-    this.array = array;
-    this.canvas = canvas;
   }
 
   drawBoard(size = 40) {
@@ -188,23 +192,28 @@ class A {
     this.ctx.lineTo(x - this.hexRect.w, y + this.hexRect.h);
     this.ctx.lineTo(x - 2 * this.hexRect.w, y);
     this.ctx.closePath();
+
+    if (el?.processed) {
+      this.ctx.fillStyle = "#000000";
+    } else {
+      if (el?.tile.startsWith("tile_grass_")) {
+        this.ctx.fillStyle = "#8AA639";
+      } else if (el?.tile.startsWith("tile_snow_")) {
+        this.ctx.fillStyle = "#BAC6DF";
+      }
+    }
+    this.ctx.fill();
+    
+    //let im = window.XX.cachedImages.get(`dialog_season_adventure_tiles.rsx/${el?.tile}_image`)
+    //this.ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x-this.sideLength/2, y-this.sideLength/2, 2*this.sideLength, 2*this.sideLength);
+
+    this.ctx.strokeStyle = "#838383";
+    this.ctx.stroke();
   }
 
   drawReward(el) {
     const x = el.x - this.offset.minx + 2*this.hexRect.w;
     const y = el.y - this.offset.miny + this.hexRect.h;
-
-    if (el?.tile === "tile_grass_1") {
-      if (el.processed) {
-        this.ctx.fillStyle = "#000000";
-      } else {
-        this.ctx.fillStyle = "#8AA639";
-      }
-      this.ctx.fill();
-
-      //let im = window.XX.cachedImages.get(`dialog_season_adventure_tiles.rsx/tile_grass_1_image`)
-      //this.ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x-this.sideLength/2, y-this.sideLength/2, 2*this.sideLength, 2*this.sideLength);
-    }
 
     if (el?.reward?.length > 0) {
       let i = 0;
@@ -265,12 +274,23 @@ class A {
 
           //this.ctx.fillStyle = '#160A02';
           //this.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+          let mm = Intl.NumberFormat('en-US', {notation: "compact", maximumFractionDigits: 2}).format(value);
+/*
+          this.ctx.font = `bold ${Math.ceil(this.hexRect.w + 10)}px Sans Serif`;
+          this.ctx.textAlign = "center";
+          this.ctx.fillStyle = "#1D1D1D";
+          this.ctx.fillText(mm, rect.x+(rect.w/2), rect.y+2*rect.h, rect.w);
+*/
+          this.ctx.fillStyle = 'rgba(25, 14, 7, 0.5)';
+          this.ctx.roundRect(rect.x, rect.y+16, rect.w, rect.w, [3]);
 
           this.ctx.font = `bold ${Math.ceil(this.hexRect.w)}px Sans Serif`;
           this.ctx.textAlign = "center";
           this.ctx.fillStyle = "#F2E84A";
-          let mm = Intl.NumberFormat('en-US', {notation: "compact", maximumFractionDigits: 2}).format(value);
-          this.ctx.fillText(mm, rect.x+(rect.w/2), rect.y+2*rect.h);
+          //this.ctx.strokeStyle = 'black';
+          //this.ctx.lineWidth = 1; 
+          this.ctx.fillText(mm, rect.x+(rect.w/2), rect.y+2*rect.h, rect.w);
+          //this.ctx.strokeText(mm, rect.x+(rect.w/2), rect.y+2*rect.h, rect.w);
           this.ctx.filter = 'none';
         }
         i++

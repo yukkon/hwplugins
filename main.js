@@ -1,5 +1,14 @@
 "use strict";
 
+Object.defineProperty(Array.prototype, 'last', {
+  get: function() {
+    if (this.length === 0) {
+      return undefined;
+    }
+    return this[this.length - 1];
+  }
+});
+
 //import {toast} from './plugins/toast.js';
 //window.toast = toast;
 
@@ -30,9 +39,7 @@ document.onreadystatechange = function () {
           div.className = "main_menu";
           document.body.appendChild(div);
 
-          if (Object.values(lib?.data?.seasonAdventure?.list).length == 4) {
-            alert('Новый остров')
-          }
+          console.info('Островов', Object.values(lib?.data?.seasonAdventure?.list).length)
 
           isl();
           stats();
