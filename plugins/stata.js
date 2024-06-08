@@ -60,7 +60,7 @@ async function raidStatistic() {
   crossClanWar_getDefenceMap
   */
 
-  new Statistics({
+  let s = new Statistics({
     clanGetInfo: result.results[0].result.response,
     clanWarGetInfo: result.results[1].result.response,
     clanWarGetDefence: result.results[2].result.response,
@@ -83,7 +83,7 @@ class Statistics {
     });
     this.generate();
     this.loa();
-    document.addEventListener("keyup", this.logKey);
+    document.addEventListener("keyup", this.logKey.bind(this));
   }
 
   // переключение табов
@@ -279,8 +279,8 @@ class Statistics {
     });
     clanInfo.sort((a, b) => {
       return (
-        Math.sqrt(Math.pow(b.activity, 2) + Math.pow(b.titanit, 2)) -
-        Math.sqrt(Math.pow(a.activity, 2) + Math.pow(a.titanit, 2))
+        Math.sqrt(Math.pow(b.activity, 2) + Math.pow(b.titanit, 2) + Math.pow(b.prestige, 2)) -
+        Math.sqrt(Math.pow(a.activity, 2) + Math.pow(a.titanit, 2) + Math.pow(a.prestige, 2))
       );
     });
 
@@ -294,7 +294,7 @@ class Statistics {
       r.appendChild(c);
 
       c = document.createElement("div");
-      c.className = `cell col-5`;
+      c.className = `cell col-3`;
       c.innerText = "Имя";
       r.appendChild(c);
 
@@ -306,6 +306,11 @@ class Statistics {
       c = document.createElement("div");
       c.className = `cell col-2`;
       c.innerText = "Титанит";
+      r.appendChild(c);
+
+      c = document.createElement("div");
+      c.className = `cell col-2`;
+      c.innerText = "Престиж";
       r.appendChild(c);
 
       c = document.createElement("div");
@@ -329,7 +334,7 @@ class Statistics {
       r.appendChild(c);
 
       c = document.createElement("div");
-      c.className = `cell col-5${i.warrior ? " w" : ""}`;
+      c.className = `cell col-3${i.warrior ? " w" : ""}`;
       c.innerText = i.name;
       r.appendChild(c);
 
@@ -341,6 +346,11 @@ class Statistics {
       c = document.createElement("div");
       c.className = `cell col-2`;
       c.innerText = i.titanit.toLocaleString("it-CH");
+      r.appendChild(c);
+
+      c = document.createElement("div");
+      c.className = `cell col-2`;
+      c.innerText = i.prestige.toLocaleString("it-CH");
       r.appendChild(c);
 
       c = document.createElement("div");
@@ -490,6 +500,7 @@ class Statistics {
         online: !!memberStatus?.online,
         activity: stats?.activitySum || 0,
         titanit: stats?.dungeonActivitySum || 0,
+        prestige: stats?.todayPrestige || 0
       };
     });
   }
@@ -871,6 +882,7 @@ class Statistics {
     const { tab, tab_content } = this.createTab("Лог");
 
     let d = document.createElement("div");
+    d.className = "table";
     d.addEventListener("wheel", Statistics.handleWheel);
     bosses.forEach((b) => {
       let r = document.createElement("div");
@@ -936,6 +948,7 @@ class Statistics {
     });
 
     let d = document.createElement("div");
+    d.className = "table";
     d.addEventListener("wheel", Statistics.handleWheel);
     data
       .sort((a, b) => b.damage - a.damage)
@@ -966,6 +979,7 @@ class Statistics {
 
     let bo = 0;
     let d = document.createElement("div");
+    d.className = "table";
     d.addEventListener("wheel", Statistics.handleWheel);
     bosses
       .sort((a, b) => this.s1(a, b))
@@ -1033,9 +1047,7 @@ class Statistics {
           })
       );
       data = data.map((row) => row.join(`\t`)).join(`\n`);
-      navigator.clipboard.writeText(data);
-      //console.log(data);
-      setProgress("csv Статистика скопирована", true);
+      navigator.clipboard.writeText(data).then(r => setProgress("CSV статистика скопирован")).catch(e => console.error("Ошибка сохранения CSV: ", e))
     }
   }
 
@@ -1043,7 +1055,7 @@ class Statistics {
     const bosses = this.getRaidInfo();
 
     let data = JSON.stringify(
-      bosses.map((b) => ({
+      bosses.map(b => ({
         name: b.name,
         date: b.date.getTime(),
         boss: b.boss,
@@ -1052,9 +1064,7 @@ class Statistics {
         pet: b.data.pet,
       }))
     );
-    navigator.clipboard.writeText(data);
-    //console.log(data);
-    setProgress("json Статистика скопирована", true);
+    navigator.clipboard.writeText(data).then(r => setProgress("Лог Асгарда скопирован")).catch(e => console.error("Ошибка копирования лога Асгарда: ", e));
   }
 }
 
@@ -1495,6 +1505,17 @@ class Drawer {
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x, 80, 30, 30);
     });
   }
+}
+
+function setProgress(text) {
+  const popup = document.querySelector("div.scriptMenu_status");
+  if (!text) {
+    popup.classList.add('scriptMenu_statusHide');
+  } else {
+    popup.classList.remove('scriptMenu_statusHide');
+    popup.innerHTML = text;
+  }
+  setTimeout(_ => popup.classList.add('scriptMenu_statusHide'), 3000);
 }
 /*
 document.addEventListener("HWDataEvent", function (event) {

@@ -218,7 +218,7 @@ class A {
     if (el?.reward?.length > 0) {
       let i = 0;
       let c = el?.reward?.length;
-      let h = 2.3 * this.hexRect.w; //люўій размер стороны под награды
+      let h = 2.6 * this.hexRect.w; //люўій размер стороны под награды
 
       el.reward.forEach(({k:type, v}) => {
         let im, id, value, item, fragment = false;
