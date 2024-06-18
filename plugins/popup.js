@@ -1,8 +1,10 @@
 "use strict";
 
-const injectFunction = () => {
-  
-  Object.values(lib.data.seasonAdventure.list).forEach(i => {
+let loader;
+
+const injectFunction = (l) => {
+  loader = l;
+  Object.values(loader.lib.seasonAdventure.list).forEach(i => {
     const div = document.createElement("div");
     div.className = "menu_button";
     div.innerHTML = `Остров ${i.id}`;
@@ -26,7 +28,7 @@ const onclick = async (e) => {
   let g = document.createElement("canvas");
   let ctx = g.getContext("2d")
 
-  const x = XX.cachedImages.get(`dialog_season_adventure_tiles.rsx/bg_season_1400_box`);
+  const x = loader.cachedImages.get(`dialog_season_adventure_tiles.rsx/bg_season_1400_box`);
   ctx.drawImage(x.image, x.x, x.y, x.width, x.height, 0, 0, x.width, x.height);
   let src = g.toDataURL();
   // #endregion
@@ -51,7 +53,7 @@ const onclick = async (e) => {
   //levels.filter(s => s.clientData.graphics.tile != "hex_empty")
   //.map(l => l.steps.map(s => Object.keys(s.reward).map(r => ({k:r, v:s.reward[r]})))).flat()
 
-  let a = new A(canvas, id, processed);
+  let a = new A(loader, canvas, id, processed);
   a.drawBoard();
 
   canvas.addEventListener("wheel", (e) => {
@@ -115,7 +117,8 @@ const onclick = async (e) => {
 };
 
 class A {
-  constructor(canvas, id, processed) {
+  constructor(loader, canvas, id, processed) {
+    this.loader = loader;
     this.canvas = canvas;
     if (canvas.getContext) {
       this.ctx = canvas.getContext("2d");
@@ -125,8 +128,8 @@ class A {
     }
     this.canvas = canvas;
     
-    const island = lib.data.seasonAdventure.list[id];
-    const levels = Object.values(lib.data.seasonAdventure.level).filter((s) => s.season == id)
+    const island = this.loader.lib.seasonAdventure.list[id];
+    const levels = Object.values(this.loader.lib.seasonAdventure.level).filter((s) => s.season == id)
     const map = Array(levels.length)
       .fill()
       .reduce((acc, val, i) => {
@@ -204,7 +207,7 @@ class A {
     }
     this.ctx.fill();
     
-    //let im = window.XX.cachedImages.get(`dialog_season_adventure_tiles.rsx/${el?.tile}_image`)
+    //let im = window.this.loader.cachedImages.get(`dialog_season_adventure_tiles.rsx/${el?.tile}_image`)
     //this.ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x-this.sideLength/2, y-this.sideLength/2, 2*this.sideLength, 2*this.sideLength);
 
     this.ctx.strokeStyle = "#838383";
@@ -223,26 +226,26 @@ class A {
       el.reward.forEach(({k:type, v}) => {
         let im, id, value, item, fragment = false;
         if (["starmoney", "gold"].includes(type)) {
-          item = Object.values(lib.data.inventoryItem.pseudo).find((e) => e.constName === type.toUpperCase() || e.constName === 'COIN')
+          item = Object.values(this.loader.lib.inventoryItem.pseudo).find((e) => e.constName === type.toUpperCase() || e.constName === 'COIN')
           value = v;
-          im = XX.cachedImages.get(`${lib.data.asset.inventory[item?.assetAtlas].atlas}/${item?.assetTexture}`);
+          im = this.loader.cachedImages.get(`${this.loader.lib.asset.inventory[item?.assetAtlas].atlas}/${item?.assetTexture}`);
         } else {
           if (['scrollFragment', 'fragmentGear'].includes(type)) {
             fragment = true;
             type = type.toLowerCase().replace('fragment','')
           }
           [id, value] = Object.entries(v)[0];
-          const items = lib.data.inventoryItem[type];
+          const items = this.loader.lib.inventoryItem[type];
           item = !!items && id in items ? items[id] : null;
 
           if (!!item) {
-            im = XX.cachedImages.get(`${lib.data.asset.inventory[item?.assetAtlas].atlas}/${item?.assetTexture}`);
+            im = this.loader.cachedImages.get(`${this.loader.lib.asset.inventory[item?.assetAtlas].atlas}/${item?.assetTexture}`);
           }
           
           if (type === "petGear") {
-            im = XX.cachedImages.get(`pet_gear.rsx/${item?.assetTexture}`);
+            im = this.loader.cachedImages.get(`pet_gear.rsx/${item?.assetTexture}`);
           } else if (type === "banner") {
-            im = XX.cachedImages.get(`banner_icons.rsx/${item?.assetTexture}`);
+            im = this.loader.cachedImages.get(`banner_icons.rsx/${item?.assetTexture}`);
           }
         }
         if (!!im) {
@@ -262,13 +265,13 @@ class A {
             rect.w
           );
 
-          let b = XX.cachedImages.get(`dialog_basic.rsx/${lib.data.enum.itemColor[5].frameAssetTexture}`);
+          let b = this.loader.cachedImages.get(`dialog_basic.rsx/${this.loader.lib.enum.itemColor[5].frameAssetTexture}`);
           if (!!item?.color) {
             let a = 'frameAssetTexture'
             if (fragment) {
               a = 'fragmentFrameAssetTexture'
             }
-            b = XX.cachedImages.get(`dialog_basic.rsx/${lib.data.enum.itemColor[item.color][a]}`);
+            b = this.loader.cachedImages.get(`dialog_basic.rsx/${this.loader.lib.enum.itemColor[item.color][a]}`);
           } 
           this.ctx.drawImage(b.image, b.x, b.y, b.width, b.height, rect.x-4, rect.y-4, rect.w+8, rect.w+8);
 
@@ -297,7 +300,7 @@ class A {
       })
     } else {
         if (!!el?.visible) {
-          let im = window.XX.cachedImages.get(
+          let im = this.loader.cachedImages.get(
             `dialog_season_adventure_tiles.rsx/${el?.visible}_image`
           );
           this.ctx.drawImage(

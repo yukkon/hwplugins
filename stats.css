@@ -12,20 +12,17 @@
 }
 
 .PopUpn_ {
-	position: fixed;
+	position: absolute;
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
 
-	/*position: absolute;*/
 	min-width: 750px;
 	max-width: 900px;
 	min-height: 50%px;
 	max-height: 80%;
 	background-color: #190e08e6;
 	z-index: 10001;
-	/*top: 169px;*/
-	/*left: 345px;*/
 	border: 3px #ce9767 solid;
 	border-radius: 10px;
 	display: flex;
@@ -41,9 +38,8 @@
 	/*margin: -12px;*/
 	color: #F9DEA5;
 	width: 100%;
+	height: 100%;
 	top: 12px;
-
-	overflow: hidden;
 }
 .o::before {
 	content: "\2B24";
@@ -122,17 +118,6 @@ progress[value]::-moz-progress-bar {
 }
 .n-4:before {
 	color: rgb(0,255,0);
-}
-.ximg{
-	position: fixed;
-	top: 0;
-	right:0;
-	margin: 15px;
-	background-color: #30A030;
-	border-radius:10px;
-	width: 20px;
-	height: 20px;
-	opacity: 0;
 }
 .circle:before {
 	content: "\25CF";
@@ -245,12 +230,12 @@ progress[value]::-moz-progress-bar {
 	text-align: right!important;
 }
 .tabber {
-	display: initial;
+	/*display: initial;*/
+	height: 100%;
 }
 .wds-tabs__wrapper {
 	display: flex;
 	justify-content: center;
-	position: relative;
 	border-bottom: 1px solid #FFF451;
 }
 .wds-tabs {
@@ -259,7 +244,6 @@ progress[value]::-moz-progress-bar {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	position: relative;
 	scrollbar-width: none;
 }
 .wds-tabs__tab {
@@ -267,7 +251,6 @@ progress[value]::-moz-progress-bar {
 	cursor: default;
 	flex-shrink: 0;
 	line-height: 14px;
-	position: relative;
 	transition: box-shadow .1s;
 	border: 1px solid transparent;
 	border-top-left-radius: 0.25rem;
@@ -303,6 +286,7 @@ progress[value]::-moz-progress-bar {
 .wds-tab__content {
 	display: none;
 	padding: 1em;
+	height: 100%;
 }
 .wds-tab__content.active {
 	display: block;
@@ -350,4 +334,8 @@ progress[value]::-moz-progress-bar {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23f4cd73' d='M 0.826 12.559 C 0.431 12.963 3.346 15.374 3.74 14.97 C 4.215 15.173 8.167 10.457 7.804 10.302 C 7.893 10.376 11.454 14.64 11.525 14.372 C 12.134 15.042 15.118 12.086 14.638 11.689 C 14.416 11.21 10.263 7.477 10.402 7.832 C 10.358 7.815 11.731 7.101 14.872 3.114 C 14.698 2.145 13.024 1.074 12.093 1.019 C 11.438 0.861 8.014 5.259 8.035 5.531 C 7.86 5.082 3.61 1.186 3.522 1.59 C 2.973 1.027 0.916 4.611 1.17 4.873 C 0.728 4.914 5.088 7.961 5.61 7.995 C 5.225 7.532 0.622 12.315 0.826 12.559 Z'/%3e%3c/svg%3e")
+}
+
+.table {
+	overflow: hidden;
 }

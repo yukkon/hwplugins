@@ -14,7 +14,7 @@
   }],
   "permissions": [ "scripting", "activeTab", "storage", "unlimitedStorage", "notifications", "contextMenus" ],
   "web_accessible_resources": [{
-      "resources": [ "main.js", "plugins/*" ],
+      "resources": [ "main.js", "ResourceLoader.js", "plugins/*" ],
       "matches": [ "https://www.hero-wars.com/*", "https://hero-wars.com/*", "https://heroes-wb.nextersglobal.com/*" ],
       "run_at": "document_end"
   }]

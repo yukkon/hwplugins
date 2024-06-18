@@ -14,7 +14,7 @@ const injectFunction = () => {
     container.className = "PopUpn_";
     b.appendChild(container);
 
-    container.innerHTML = "<div id='__result'><div class='tabber wds-tabber'><div class='wds-tabs__wrapper'><ul class='wds-tabs'></ul></div></div><div class='tooltip' role='tooltip'><canvas id='tip'></canvas></div></div><div class='ximg'></div>";
+    container.innerHTML = "<div id='__result'><div class='tabber wds-tabber'><div class='wds-tabs__wrapper'><ul class='wds-tabs'></ul></div></div><div class='tooltip' role='tooltip'><canvas id='tip'></canvas></div></div>";
 
     b.classList.remove("PopUp_hideBlock");
 

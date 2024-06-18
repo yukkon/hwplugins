@@ -65,7 +65,7 @@ class Raid {
 			} else {
 				setProgress();
 				this.clear();
-				await popup.confirm(`<img src=${src} /><br>${I18N('COMPLETED')}<br>${I18N('REPETITIONS')}: ${this.times}`, [{
+				await popup.confirm(`<img src=${src} /><br>${I18N('COMPLETED')}<br>${I18N('REPETITIONS')}: ${this.count}`, [{
 					msg: 'Ok',
 					result: true
 				}, ])
@@ -90,7 +90,7 @@ class Raid {
 
 				let im;
 				if (type === 'gear') {
-				  im = window.XX.cachedImages.get(`gear_icons_05.xml/${item.assetTexture}`) ?? x.cachedImages.get(`gear_icons_2_05.xml/${item.assetTexture}`);
+				  im = window.XX.cachedImages.get(`gear_icons_05.xml/${item.assetTexture}`) ?? window.XX.cachedImages.get(`gear_icons_2_05.xml/${item.assetTexture}`);
 				} else {
 					im = window.XX.cachedImages.get(`scroll_icons.xml/${item.assetTexture}`)
 				}
