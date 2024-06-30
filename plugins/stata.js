@@ -110,7 +110,7 @@ class Statistics {
       };
     })();
     let canvas = document.querySelector(`canvas#tip`);
-    let dr = new Drawer(canvas, window.XX);
+    let dr = new Drawer(canvas, window.XXX);
 
     const handleMouseEnter = (e) => {
       let data = JSON.parse(e.target.dataset.toggleData);

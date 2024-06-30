@@ -34,7 +34,7 @@ const onclick = async (e) => {
   // #endregion
 
   container.innerHTML =
-    `<div style='background-image: url(${src});background-size:100% 100%; overflow:hidden;'><canvas class='dragme' id='hexagonCanvas' style='border: 1px solid black; position: relative;'></canvas></div>`;
+    `<div><input type="checkbox" id="showProcessed" /><label for="showProcessed">Показывать пройденные</label></div><div style='background-image: url(${src});background-size:100% 100%; overflow:hidden;'><canvas class='dragme' id='hexagonCanvas' style='border: 1px solid black; position: relative;'></canvas></div>`;
 
   b.classList.remove("PopUp_hideBlock");
 
@@ -111,8 +111,13 @@ const onclick = async (e) => {
 
   canvas.onclick = (e) => { 
     if (!window.drag) {
-      console.log(a)
+      //console.log(a)
     }
+  }
+
+  document.querySelector("#showProcessed").onchange = (e) => {
+    a.showProcessed = !a.showProcessed;
+    a.drawBoard()
   }
 };
 
@@ -120,6 +125,7 @@ class A {
   constructor(loader, canvas, id, processed) {
     this.loader = loader;
     this.canvas = canvas;
+    this.showProcessed = false;
     if (canvas.getContext) {
       this.ctx = canvas.getContext("2d");
       this.ctx.fillStyle = "#008000"; //8AA639
@@ -172,7 +178,7 @@ class A {
     let ys = this.array.map(el => el.y);
 
     this.offset = { minx: Math.min(...xs), miny: Math.min(...ys), maxx: Math.max(...xs), maxy: Math.max(...ys) };
-    console.log('Офсет', this.offset)
+    //console.log('Офсет', this.offset)
 
     this.canvas.width = this.ctx.width = 4 * this.hexRect.w + (this.offset.maxx - this.offset.minx);
     this.canvas.height = this.ctx.height = 2 * this.hexRect.h + (this.offset.maxy - this.offset.miny);
@@ -196,7 +202,7 @@ class A {
     this.ctx.lineTo(x - 2 * this.hexRect.w, y);
     this.ctx.closePath();
 
-    if (el?.processed) {
+    if (el?.processed && this.showProcessed) {
       this.ctx.fillStyle = "#000000";
     } else {
       if (el?.tile.startsWith("tile_grass_")) {
@@ -250,7 +256,7 @@ class A {
         }
         if (!!im) {
           let rect = {x: x-h/2+(i*h/c), y: y-h/(2*c), w:h/c, h:Math.ceil(this.hexRect.w/c)+4};
-          if (el.processed) {
+          if (el.processed && this.showProcessed) {
             this.ctx.filter = 'grayscale(1)';
           }
           this.ctx.drawImage(
@@ -275,25 +281,24 @@ class A {
           } 
           this.ctx.drawImage(b.image, b.x, b.y, b.width, b.height, rect.x-4, rect.y-4, rect.w+8, rect.w+8);
 
-          //this.ctx.fillStyle = '#160A02';
-          //this.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
           let mm = Intl.NumberFormat('en-US', {notation: "compact", maximumFractionDigits: 2}).format(value);
-/*
-          this.ctx.font = `bold ${Math.ceil(this.hexRect.w + 10)}px Sans Serif`;
-          this.ctx.textAlign = "center";
-          this.ctx.fillStyle = "#1D1D1D";
-          this.ctx.fillText(mm, rect.x+(rect.w/2), rect.y+2*rect.h, rect.w);
-*/
-          this.ctx.fillStyle = 'rgba(25, 14, 7, 0.5)';
-          this.ctx.roundRect(rect.x, rect.y+16, rect.w, rect.w, [3]);
 
+          //draw bg
+this.ctx.font = `bold ${Math.ceil(this.hexRect.w)}px Sans Serif`;
+this.ctx.textAlign = "center";
+this.ctx.fillStyle = "#F2E84A";
+let wt = this.ctx.measureText(mm).width;
+
+          this.ctx.fillStyle = 'rgba(25, 14, 8, 0.8)';
+          this.ctx.fillRect(rect.x+(rect.w/2)-(wt/2)-4, y+this.hexRect.h-Math.ceil(this.hexRect.w)-2, wt+8, Math.ceil(this.hexRect.w));
+
+          //draw text
           this.ctx.font = `bold ${Math.ceil(this.hexRect.w)}px Sans Serif`;
           this.ctx.textAlign = "center";
+          this.ctx.textBaseline = "bottom";
           this.ctx.fillStyle = "#F2E84A";
-          //this.ctx.strokeStyle = 'black';
-          //this.ctx.lineWidth = 1; 
-          this.ctx.fillText(mm, rect.x+(rect.w/2), rect.y+2*rect.h, rect.w);
-          //this.ctx.strokeText(mm, rect.x+(rect.w/2), rect.y+2*rect.h, rect.w);
+          this.ctx.fillText(mm, rect.x+(rect.w/2), y+this.hexRect.h, rect.w);
+          
           this.ctx.filter = 'none';
         }
         i++
