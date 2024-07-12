@@ -168,7 +168,7 @@ class Drawer {
 
   draw(canvas, data) {
     this.#canvas = canvas;
-    this.#ctx = canvas.getContext("2d");
+    this.#ctx = this.#canvas.getContext("2d");
 
     if (!!data.attackers[0].color) {
       this.#canvas.width =
@@ -201,20 +201,22 @@ class Drawer {
         this.#drawSpirit(a, i);
       });
     }
+
+    //return this.#canvas.toDataURL();
   }
 
-  async #drawAttacker(type, data, i, add) {
+  #drawAttacker(type, data, i, add) {
     let k, im;
     // bg
     if (type == "hero") {
       k = this.map[type].background(data.color);
-      im = await this.#x.cachedImages.get(k);
+      im = this.#x.cachedImages.get(k);
 
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * (i + add), 10, 80, 80);
     }
     // icon
     k = this.map[type].icon(data.id);
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 7 + 105 * (i + add), 12, 80, 80);
     // border
     if (type == "hero") {
@@ -222,11 +224,11 @@ class Drawer {
     } else {
       k = this.map[type].border(data.id, data.element);
     }
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * (i + add), 4, 94, 94);
     // stars
     if (data.star == 6) {
-      im = await this.#x.cachedImages.get(this.map.absolute);
+      im = this.#x.cachedImages.get(this.map.absolute);
       this.#ctx.drawImage(
         im.image, im.x, im.y, im.width, im.height,
         9 + 105 * (i + add),
@@ -235,7 +237,7 @@ class Drawer {
         im.height
       );
     } else {
-      im = await this.#x.cachedImages.get(this.map.star);
+      im = this.#x.cachedImages.get(this.map.star);
       [...Array(data.star)].forEach((_, j) => {
         this.#ctx.drawImage(
           im.image, im.x, im.y, im.width, im.height,
@@ -252,7 +254,7 @@ class Drawer {
     } else {
       k = this.map.level_base;
     }
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * (i + add), 2, 42, 28);
 
     // level
@@ -264,7 +266,7 @@ class Drawer {
     // favor
     if (!!data.petId) {
       k = this.map.pet.small(data.petId);
-      im = await this.#x.cachedImages.get(k);
+      im = this.#x.cachedImages.get(k);
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 68 + 105 * (i + add), 2, 35, 34);
     }
     // power
@@ -314,27 +316,27 @@ class Drawer {
     }
   }
 
-  async #drawPet(data, add) {
+  #drawPet(data, add) {
     // bg
     let k = this.map.pet.background(data.color);
-    let im = await this.#x.cachedImages.get(k);
+    let im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 4 + 105 * add, 9, 80, 80);
     // icon
     k = this.map.pet.icon(data.id);
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     if (!!im) {
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 7 + 105 * add, 10, 80, 80);
     }
     // border
     k = this.map.pet.border(data.color);
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * add, 4, 94, 94);
     // stars
     if (data.star == 6) {
-      im = await this.#x.cachedImages.get(this.map.absolute);
+      im = this.#x.cachedImages.get(this.map.absolute);
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * add, 69, im.width + 10, im.height);
     } else {
-      im = await this.#x.cachedImages.get(this.map.star);
+      im = this.#x.cachedImages.get(this.map.star);
       [...Array(data.star)].forEach((_, j) => {
         this.#ctx.drawImage(
           im.image, im.x, im.y, im.width, im.height,
@@ -347,7 +349,7 @@ class Drawer {
     }
     // level border
     k = this.map.level(data.color);
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * add, 2, 42, 28);
 
     // level
@@ -365,24 +367,24 @@ class Drawer {
     }
   }
 
-  async #drawSpirit(data, i) {
+  #drawSpirit(data, i) {
     // icon
     let k = this.map.spirit.icon(data.type);
-    let im = await this.#x.cachedImages.get(k);
+    let im = this.#x.cachedImages.get(k);
 
     if (!!im) {
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * i, 12, 80, 80);
     }
     // border
     k = this.map.spirit.border(data.level);
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * i, 10, 90, 90);
     // stars
     if (data.star == 6) {
-      im = await this.#x.cachedImages.get(this.map.absolute);
+      im = this.#x.cachedImages.get(this.map.absolute);
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 18 + 105 * i, 69, im.width, im.height);
     } else {
-      im = await this.#x.cachedImages.get(this.map.star);
+      im = this.#x.cachedImages.get(this.map.star);
       [...Array(data.star)].forEach((_, j) => {
         this.#ctx.drawImage(
           im.image, im.x, im.y, im.width, im.height,
@@ -395,23 +397,23 @@ class Drawer {
     }
     // level border
     k = this.map.spirit.level(data.level);
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 30 + 105 * i, 2, im.width, im.height);
     // level
     this.#ctx.fillText(data.level, 51 + 105 * i, 23);
   }
 
-  async #drawBanner(data) {
+  #drawBanner(data) {
     // icon
     let k = this.map.banner.icon(data.id);
-    let im = await this.#x.cachedImages.get(k);
+    let im = this.#x.cachedImages.get(k);
 
     if (!!im) {
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9, 12, 80, 80);
     }
     // border
     k = this.map.banner.border;
-    im = await this.#x.cachedImages.get(k);
+    im = this.#x.cachedImages.get(k);
     this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 0, 4, 94, 94);
 
     this.#drawStones(data.slots);
@@ -419,11 +421,11 @@ class Drawer {
 
   #drawStones(data) {
     const c = Object.values(data).length;
-    Object.values(data).forEach(async (s, i) => {
+    Object.values(data).forEach((s, i) => {
       const st = this.#x.lib.inventoryItem.bannerStone[s];
       // icon
       let k = `banner_stone_icons.xml/${st.assetTexture}`;
-      let im = await this.#x.cachedImages.get(k);
+      let im = this.#x.cachedImages.get(k);
 
       let x = c + 30 * i + (30 * (3 - c)) / (c + 1);
 
@@ -432,7 +434,7 @@ class Drawer {
       }
       // border
       k = this.map.stone.border(st.color);
-      im = await this.#x.cachedImages.get(k);
+      im = this.#x.cachedImages.get(k);
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x, 80, 30, 30);
     });
   }

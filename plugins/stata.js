@@ -2,7 +2,10 @@
 
 import Drawer from '../Drawer.js';
 
-const injectFunction = () => {
+let loader;
+
+const injectFunction = (l) => {
+  loader = l;
   const div = document.createElement("div");
   div.className = "scriptMenu_button";
   div.innerHTML = '<div class="scriptMenu_buttonText">Статистика</div>';
@@ -83,7 +86,7 @@ class Statistics {
       );
       r && (e.preventDefault(), this.d(r));
     });
-    this.drawer = new Drawer(window.XXX);
+    this.drawer = new Drawer(loader);
     this.generate();
     this.loa();
     document.addEventListener("keyup", this.logKey.bind(this));

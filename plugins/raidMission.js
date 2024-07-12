@@ -90,13 +90,13 @@ class Raid {
 
 				let im;
 				if (type === 'gear') {
-				  im = window.XX.cachedImages.get(`gear_icons_05.xml/${item.assetTexture}`) ?? window.XX.cachedImages.get(`gear_icons_2_05.xml/${item.assetTexture}`);
+				  im = window.XXX.cachedImages.get(`gear_icons_05.xml/${item.assetTexture}`) ?? window.XXX.cachedImages.get(`gear_icons_2_05.xml/${item.assetTexture}`);
 				} else {
-					im = window.XX.cachedImages.get(`scroll_icons.xml/${item.assetTexture}`)
+					im = window.XXX.cachedImages.get(`scroll_icons.xml/${item.assetTexture}`)
 				}
 				ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 56*i+3, 3, 50, 50);
 
-				const b = window.XX.cachedImages.get(`dialog_basic.rsx/${lib.data.enum.itemColor[item.color].fragmentFrameAssetTexture}`);
+				const b = window.XXX.cachedImages.get(`dialog_basic.rsx/${lib.data.enum.itemColor[item.color].fragmentFrameAssetTexture}`);
 				ctx.drawImage(b.image, b.x, b.y, b.width, b.height, 56*i, 0, 56, 56);
 
 				ctx.font = "bold 16px Sans Serif";

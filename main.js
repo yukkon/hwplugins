@@ -9,6 +9,23 @@ Object.defineProperty(Array.prototype, "last", {
   },
 });
 
+Object.defineProperty(Date.prototype, 'week', {
+  get() {
+      let date = new Date(this.getTime());
+      date.setHours(0, 0, 0, 0);
+
+      let day1 = new Date(date.getFullYear(), 0, 1);
+      let days = Math.floor((date - day1) / (24 * 60 * 60 * 1000));
+
+      let d = day1.getDay();
+      if (d == 0) { d = 7 }
+
+      let week = Math.ceil((d + days) / 7);
+
+      return week;
+  }
+})
+
 function setProgress(text) {
   const popup = document.querySelector("div.scriptMenu_status");
   if (!text) {
@@ -27,7 +44,7 @@ window.week = () => {
   let day1 = new Date(date.getFullYear(), 0, 1);
   let days = Math.floor((date - day1) / (24 * 60 * 60 * 1000));
 
-  let week = Math.ceil((date.getDay() + 1 + days) / 7);
+  let week = Math.ceil((days + 1) / 7);
 
   return week;
 };
@@ -141,25 +158,37 @@ document.onreadystatechange = function () {
 
         if (Object.values(lib?.data?.seasonAdventure?.list).length > 5) {
           alert("Новый остров");
-        } else if (lib?.data?.seasonAdventure?.list[4].map.regions.length > 1) {
+        } else if (lib?.data?.seasonAdventure?.list[4].map.regions.length > 2) {
           alert("Новый регион");
         }
         runPlugins();
+
         const now = new Date();
 
-        //if (now.getDay() == 0 && now.getHours() > 20) {
-        asgard();
-        //}
+        if (now.getDay() == 0 && now.getHours() > 19 && localStorage['userId'] === '13877391') {
+          asgard();
+        }
       }
     };
     init();
   }
 };
 
+function blockCpu(ms) {
+  var now = new Date().getTime();
+  var result = 0
+  while(true) {
+      result += Math.random() * Math.random();
+      if (new Date().getTime() > now +ms)
+          return;
+  }   
+}
+
+
 async function asgard() {
   const bosses = await raid();
 
-  if (bosses.length > 0) {
+  if (!!bosses) {
     fetch("http://localhost:888/api/Application", {
       headers: {
         accept: "*/*",
@@ -189,7 +218,7 @@ const isChecked = (key) => {
 };
 
 function runPlugins() {
-  import("./ResourceLoader.js").then((m) => {
+  import("./ResourceLoader.js").then(m => {
     let l = new m.default(NXFlashVars);
     l.load([
       { key: "assets/js/gui/dialog_basic.rsx" },
@@ -209,13 +238,10 @@ function runPlugins() {
       { key: "assets/inventory_icons/consumable.xml" },
       { key: "assets/quest_icons/quest_icons.xml" },
     ])
-      .then((p) => {
-        window.XXX = p;
-        return p;
-      })
-      .then((x) => {
-        import("./plugins/stata.js").then((m) => m.default());
-        import("./plugins/popup.js").then((m) => m.default(x));
-      });
+    .then(p => {
+      window.XXX = p;
+      import("./plugins/stata.js").then(m => m.default(p));
+      import("./plugins/island.js").then(m => m.default(p));
+    });
   });
 }

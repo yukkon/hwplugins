@@ -152,7 +152,7 @@ class A {
         processed: processed[el.level],
         tile: el.clientData.graphics.tile,
         visible: el.clientData.graphics.visible[0],
-        reward: el.steps.map(s => Object.keys(s.reward).map(r => ({k:r, v:s.reward[r]}))).flat(),
+        reward: el.steps.map(s => Object.keys(s.reward).map(r => !Object.keys(s.reward[r]).length ? ({k:r, v:s.reward[r]}) : Object.keys(s.reward[r]).map(i => ({k:r, v:{[i]:s.reward[r][i]}})) )).flat().flat()
       }));
   }
 

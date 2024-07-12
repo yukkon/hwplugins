@@ -3123,10 +3123,7 @@ class vfe {
     return this.framesByName[e];
   }
   getAllResources() {
-    return Object.values(this.frames).map((e) => e.class);
-  }
-  getImages() {
-    return this.images;
+    return Object.values(this.frames).map(e => e.class);
   }
 }
 
@@ -3166,23 +3163,15 @@ class Xx {
   async processResx(e, fileName, path, resource, filter) {
     let c = new vfe(e, fileName, path, {}),
       u = c.getAllResources();
-    null != filter && (u = u.filter((T) => filter.some((k) => T.match(k))));
+    null != filter && (u = u.filter(T => filter.some(k => T.match(k))));
 
-    let g = c
-        .getImages()
-        .map((T) =>
-          this.getResxImage(
-            `${this.NXFlashVars.static_url}${this.index[T.resourceName].path}`,
-            T.id
-          )
-        ),
+    let g = c.images.map(T => this.getResxImage(`${this.NXFlashVars.static_url}${this.index[T.resourceName].path}`, T.id)),
       b = await Promise.all(g),
-      x = u
-        .filter((T) => null != T && "" != T)
-        .map((T) => {
+      x = u.filter(T => !!T)
+        .map(T => {
           let k = c.getByName(T),
             X = fileName + "/" + k.class,
-            img = b.find((q) => q.id == k.imageIndex).image;
+            img = b.find(q => q.id == k.imageIndex).image;
           return this.storeImage(img, k.width, k.height, k.x, k.y, X, resource);
         });
     return Promise.all(x);
@@ -3194,10 +3183,7 @@ class Xx {
     null != filter &&
       (u = u.filter((T) => filter.some((k) => T.match(k.name))));
 
-    let b = await this.getResxImage(
-        `${this.NXFlashVars.static_url}${this.index[path + c.image].path}`,
-        0
-      ),
+    let b = await this.getResxImage(`${this.NXFlashVars.static_url}${this.index[path + c.image].path}`),
       x = u
         .filter((T) => !!T?.name)
         .map((T) => {
@@ -3208,43 +3194,20 @@ class Xx {
     return Promise.all(x);
   }
 
-  getResxImage(fullPath, i) {
-    let s = new Image();
-    s.crossOrigin = "Anonymous"; // to avoid CORS if used with Canvas
-    return (
-      new Promise((o, l) => {
-        (s.onload = () => o()), (s.src = fullPath);
-      }),
-      {
-        image: s,
-        id: i,
-      }
-    );
+  async getResxImage(fullPath, id=0) {
+    return await fetch(fullPath).then(r => r.blob()).then(blob => createImageBitmap(blob)).then(i => ({image: i, id}));
   }
 
   storeImage(img, width, height, x, y, key, resource) {
-    let g = window.document.createElement("canvas");
-    g.width = width;
-    g.height = height;
-    g.getContext("2d").drawImage(img, x, y, width, height, 0, 0, width, height);
-
-    return new Promise((r) => {
-      g.toBlob((D) => {
-        if (D) {
-          let F = URL.createObjectURL(D);
-          this.cachedImages.set(key, {
-            url: F,
-            image: img,
-            x,
-            y,
-            width,
-            height,
-          });
-          r();
-        } else {
-          r();
-        }
+    return new Promise(r => {
+      this.cachedImages.set(key, {
+        image: img,
+        x: ~~x,
+        y: ~~y,
+        width: ~~width,
+        height: ~~height,
       });
+      r();
     });
   }
 
@@ -3255,6 +3218,10 @@ class Xx {
     if (!this.lib) {
       await this.loadLib();
     }
+/*    if (!this.locale) {
+      await this.loadLocale();
+    }
+*/
     let p = resources.map(async ({ key, filter = null }) => {
       let file = key.slice(key.lastIndexOf("/") + 1),
         ext = file.slice(file.lastIndexOf(".") + 1),
@@ -3280,37 +3247,39 @@ class Xx {
       return this;
     })
   }
-
-  getImageFromCache(key) {
-    if (this.cachedImages.has(key)) {
-      return new Promise((r) => {
-        let url = this.cachedImages.get(key).url;
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.onload = function () {
-          r(this);
-        };
-        img.src = url;
-      });
-    } else {
-      console.error("cachedImages has no key: " + key);
-    }
-  }
-  getResourcePath(n) {
-    let e = this.index[n];
-    return null == e ? null : this.NXFlashVars.static_url + e.path;
-  }
-  getResourceFromCache(n) {
-    return null != this.cachedResources[n] ? this.cachedResources[n] : null;
-  }
 }
 
 class mp {
   constructor(str) {
-    const xml = new window.DOMParser().parseFromString(str, "text/xml");
-    const o = this.xmlToJson(xml);
+    const o = this.parseXmlToJson(str);
     this.image = o.TextureAtlas.__attributes__.imagePath;
-    this.frames = o.TextureAtlas.SubTexture.map((i) => i.__attributes__);
+    this.frames = o.TextureAtlas.value.SubTexture.map(i => i.__attributes__);
+  }
+
+  parseXmlToJson(xml) {
+    xml = xml.replace('\n', '').replace('\r', '').replace(/\s{2,}/g, '').trim()
+    const json = {};
+    for (const res of xml.matchAll(/<([^\/> ]+)\s*([^>]*)\s*(?:\/>|>(.*)<\/\1>)/gs)) {
+        const key = res[1];
+        const value = res[3] && this.parseXmlToJson(res[3]);
+
+        let o = {
+          __attributes__: [...res[2].matchAll(/([^\s]+?)="(.*?)"/g)].reduce((a, v) => {a[v[1]] = v[2]; return a}, {}),
+          value: ((value && !!Object.keys(value)) ? value : res[3]) || null
+        }
+
+        if (!!json[key]) {
+          if (!Array.isArray(json[key])) {
+            let v = json[key];
+            json[key] = [v, o]
+          } else {
+            json[key].push(o)
+          }
+        } else {
+          json[key] = o;
+        }
+    }
+    return json;
   }
 
   xmlToJson(xml) {

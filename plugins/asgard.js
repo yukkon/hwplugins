@@ -16,6 +16,7 @@ async function getRaidInfo() {
   const calls = [
     { name: "clanGetInfo", args: {}, ident: "clanGetInfo" },
     { name: "clanRaid_logBoss", args: {}, ident: "clanRaid_logBoss" },
+    { name: "clanRaid_logStats", args: {}, ident: "clanRaid_logStats" },
   ];
 
   const result = await Send(JSON.stringify({ calls }));
@@ -25,11 +26,12 @@ async function getRaidInfo() {
   const res = {
     clanGetInfo: result.results[0].result.response,
     clanRaid_logBoss: result.results[1].result.response,
+    clanRaidStats: result.results[2].result.response,
   };
 
   let data = [];
   if (!res.clanGetInfo?.clan?.members || !res.clanRaid_logBoss) {
-    return [];
+    return null;
   }
 
   const h = Object.values(res.clanRaid_logBoss)
@@ -73,12 +75,13 @@ async function getRaidInfo() {
         boss: b.level,
         damage: b.damage,
         attackers,
-        pet: !!p ? p : undefined
+        pet: !!p ? p : undefined,
+        effects: i.effects.attackers
       });
     });
   });
 
-  return data.sort((a, b) => a.date - b.date);
+  return {log: data.sort((a, b) => a.date - b.date), stats: res.clanRaidStats};
 }
 
 export default getRaidInfo;
