@@ -3139,6 +3139,7 @@ class Xx {
     let file = this.NXFlashVars.index_url.slice(
       this.NXFlashVars.index_url.lastIndexOf("/") + 1
     );
+    console.log(`Index file: ${file}`)
     let ext = file.slice(file.lastIndexOf(".") + 1);
     if (ext == "gz") {
       return fetch(this.NXFlashVars.index_url)
@@ -3156,6 +3157,7 @@ class Xx {
   async loadLib() {
     const lib_url = this.index["lib/lib.json.gz"].path;
     const defaultLibUrl = lib_url.split('.gz').shift();
+    console.log(`Lib file: ${defaultLibUrl}`)
 
     this.lib = await fetch(`${this.NXFlashVars.static_url}${defaultLibUrl}`).then(r => r.json());
   }
@@ -3226,7 +3228,8 @@ class Xx {
       let file = key.slice(key.lastIndexOf("/") + 1),
         ext = file.slice(file.lastIndexOf(".") + 1),
         path = key.replace(file, "");
-      const rsx_url = this.index[key].path;
+      const rsx_url = this.index[key]?.path;
+      if (!rsx_url) { console.error(`Resource ${key} not found`); return Promise.resolve(); }
       let c = this.NXFlashVars.platformNetwork + "/" + key;
 
       if (ext == "rsx") {

@@ -26,7 +26,7 @@ Object.defineProperty(Date.prototype, 'week', {
   }
 })
 
-function setProgress(text) {
+window.setProgress = (text) => {
   const popup = document.querySelector("div.scriptMenu_status");
   if (!text) {
     popup.classList.add("scriptMenu_statusHide");
@@ -34,7 +34,13 @@ function setProgress(text) {
     popup.classList.remove("scriptMenu_statusHide");
     popup.innerHTML = text;
   }
-  setTimeout((_) => popup.classList.add("scriptMenu_statusHide"), 7000);
+  if (popup.dataset.timeout) {
+    clearTimeout(popup.dataset.timeout)
+  }
+  popup.dataset.timeout = setTimeout((_) => {
+    popup.classList.add("scriptMenu_statusHide");
+    popup.dataset.timeout = undefined;
+  }, 7000);
 }
 
 window.week = () => {
@@ -60,6 +66,10 @@ window.applyFavor = (hero, petId) => {
   hero.favorPetId = petId;
   hero.favorPower = 11064;
   hero.petId = petId;
+
+  // additionalPower 
+  // добавили статы
+  // добавили скил
 };
 
 window.applyHeroPower = (hero) => {
@@ -122,8 +132,8 @@ window.getHero = async (id, favor) => {
   return JSON.stringify(h);
 };
 
-//import {toast} from './plugins/toast.js';
-//window.toast = toast;
+import {toast} from './plugins/toast.js';
+window.toast = toast;
 
 //import {toast} from './toast.js';
 //toast.error('ALARMA');
@@ -138,7 +148,16 @@ window.getHero = async (id, favor) => {
 //ifu();
 
 import raid from "./plugins/asgard.js";
-import "./plugins/raidMission.js";
+import TaskManager from './TaskManager.js';
+
+
+//import "./plugins/raidMission.js";
+//import "./plugins/fixAsgardBattle.js";
+
+/*document.addEventListener("HWDataEvent", function(event) {
+  import(`./plugins/${event.detail.type}.js`).then(m => m.default(event.detail.data)).catch(e => {});
+});*/
+
 
 // alternative to DOMContentLoaded
 document.onreadystatechange = function () {
@@ -156,11 +175,21 @@ document.onreadystatechange = function () {
         div.className = "main_menu";
         document.body.appendChild(div);
 
-        if (Object.values(lib?.data?.seasonAdventure?.list).length > 5) {
-          alert("Новый остров");
-        } else if (lib?.data?.seasonAdventure?.list[4].map.regions.length > 2) {
-          alert("Новый регион");
+        const maps = JSON.parse(localStorage.getItem("seasonAdventure")) || {};
+        //{1: 2, 2: 2, 4: 4, 4: 4}
+        if (Object.values(lib?.data?.seasonAdventure?.list).length != Object.values(maps).length) {
+          toast.info("Новый остров");
+        } else {
+          const regs = Object.keys(lib?.data?.seasonAdventure?.list).every(m => 
+            lib?.data?.seasonAdventure?.list[m].map?.regions.length == maps[m]
+          )
+          if (!regs) {
+            toast.info("Новый регион");
+          }
         }
+        const o = Object.values(lib?.data?.seasonAdventure?.list).reduce((acc, val) => {acc[val.id]=Object.values(val.map.regions).length;return acc;}, {})
+        localStorage.setItem("seasonAdventure", JSON.stringify(o))
+
         runPlugins();
 
         const now = new Date();
@@ -168,6 +197,9 @@ document.onreadystatechange = function () {
         if (now.getDay() == 0 && now.getHours() > 19 && localStorage['userId'] === '13877391') {
           asgard();
         }
+
+        window.taskMan = new TaskManager(60);
+        toast.error('ALARMA');
       }
     };
     init();
@@ -242,6 +274,13 @@ function runPlugins() {
       window.XXX = p;
       import("./plugins/stata.js").then(m => m.default(p));
       import("./plugins/island.js").then(m => m.default(p));
+      import("./plugins/Events.js").then(m => m.default(p));
+      import("./plugins/fixAsgardBattle.js").then(m => m.default(p));
+      import("./plugins/slaveFixBattle.js").then(m => m.default(p));
+      import("./plugins/InvasionAutoBoss.js").then(m => m.default(p));
+      import("./plugins/testToast.js").then(m => m.default(p));
+      //import("./plugins/battlePassRewards.js").then(m => m.default(p));
+      import("./plugins/AutoMission.js").then(m => m.default(p));
     });
   });
 }

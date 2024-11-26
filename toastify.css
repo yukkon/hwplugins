@@ -9,7 +9,7 @@
   --button-bg-color-green-game: #49AC20;
   --border-color: #ce9767; /**/
 }
-
+/*
 .toastify2 {
   position: absolute;
   z-index: 10001;
@@ -29,7 +29,6 @@
   transition: 0.5s;
   padding: 2px 10px 3px;
 }
-
 .toastify {
   position: fixed;
   left: 50%;
@@ -41,6 +40,38 @@
   background: #190e08e6;
   border: 1px #ce9767 solid;  
   display: inline-block;
+  opacity: .65;
+  transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  max-width: calc(50% - 20px);
+  z-index: 2147483647;
+  max-width: fit-content;
+  //animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}  
+*/
+
+.toast {
+  position: absolute;
+  z-index: 10001;
+  top: 5px;
+  left: 90%;
+  font-size: 18px;
+  font-family: sans-serif;
+  font-weight: 600;
+  font-stretch: condensed;
+  letter-spacing: 1px;
+  padding: 2px 10px 3px;
+}
+
+.toastify {
+  padding: 12px 20px;
+  margin: 5px;
+  color: #fce1ac;
+  border-radius: 10px 10px 10px 10px;
+  background: #190e08e6;
+  border: 1px #ce9767 solid;  
   opacity: .65;
   transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
   border-radius: 2px;

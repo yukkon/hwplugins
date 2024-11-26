@@ -71,7 +71,7 @@ async function getRaidInfo() {
       data.push({
         id: u.id,
         name: u.name,
-        date: new Date(Number(i.startTime) * 1000),
+        date: i.startTime,
         boss: b.level,
         damage: b.damage,
         attackers,

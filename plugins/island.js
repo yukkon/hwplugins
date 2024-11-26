@@ -5,12 +5,14 @@ let loader;
 const injectFunction = (l) => {
   loader = l;
   Object.values(loader.lib.seasonAdventure.list).forEach(i => {
+    if (i.map.cells.length > 2) {
     const div = document.createElement("div");
     div.className = "menu_button";
     div.innerHTML = `Остров ${i.id}`;
     div.dataset.id = i.id;
     div.addEventListener("click", onclick);
     document.querySelector(".main_menu").appendChild(div);
+    }
   })
 };
 
@@ -111,7 +113,8 @@ const onclick = async (e) => {
 
   canvas.onclick = (e) => { 
     if (!window.drag) {
-      //console.log(a)
+      const offset = {x: e.clientX, y: e.clientY};
+      console.log(offset)
     }
   }
 
@@ -145,15 +148,15 @@ class A {
         };
         return acc;
       }, {});
-      this.array = levels
-      .filter(s => s.clientData.graphics.tile != "hex_empty")
+      let l = levels
       .map(el => ({
         ...map[el.level],
         processed: processed[el.level],
         tile: el.clientData.graphics.tile,
         visible: el.clientData.graphics.visible[0],
-        reward: el.steps.map(s => Object.keys(s.reward).map(r => !Object.keys(s.reward[r]).length ? ({k:r, v:s.reward[r]}) : Object.keys(s.reward[r]).map(i => ({k:r, v:{[i]:s.reward[r][i]}})) )).flat().flat()
-      }));
+        reward: el.steps.map(s => Object.keys(s.reward).map(r => !Object.keys(s.reward[r]).length ? ({k:r, v:s.reward[r]}) : Object.keys(s.reward[r]).map(i => ({k:r, v:{[i]:s.reward[r][i]}})) )).flat().flat(),
+      }))
+      this.array = l.filter(el => !!el.reward.length || el.tile != 'hex_empty');
   }
 
   drawBoard(size = 40) {
@@ -209,6 +212,8 @@ class A {
         this.ctx.fillStyle = "#8AA639";
       } else if (el?.tile.startsWith("tile_snow_")) {
         this.ctx.fillStyle = "#BAC6DF";
+      } else {
+        console.log(el?.tile)
       }
     }
     this.ctx.fill();
@@ -288,9 +293,8 @@ this.ctx.font = `bold ${Math.ceil(this.hexRect.w)}px Sans Serif`;
 this.ctx.textAlign = "center";
 this.ctx.fillStyle = "#F2E84A";
 let wt = this.ctx.measureText(mm).width;
-
-          this.ctx.fillStyle = 'rgba(25, 14, 8, 0.8)';
-          this.ctx.fillRect(rect.x+(rect.w/2)-(wt/2)-4, y+this.hexRect.h-Math.ceil(this.hexRect.w)-2, wt+8, Math.ceil(this.hexRect.w));
+this.ctx.fillStyle = 'rgba(25, 14, 8, 0.8)';
+this.ctx.fillRect(rect.x+(rect.w/2)-(wt/2)-4, y+this.hexRect.h-Math.ceil(this.hexRect.w)-2, wt+8, Math.ceil(this.hexRect.w));
 
           //draw text
           this.ctx.font = `bold ${Math.ceil(this.hexRect.w)}px Sans Serif`;

@@ -1,6 +1,13 @@
 class T {
   constructor(type) {
     this.type = type;
+    let t = document.querySelector(".toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.className = 'toast';
+      document.body.appendChild(t);
+    }
+    this.toast = t;
   }
 
   show(message) {
@@ -10,15 +17,16 @@ class T {
     let divElement = document.createElement("div");
     divElement.className = `toastify ${this.type}`;
     divElement.innerHTML = message;
-    this.toastElement = divElement;
+    //this.toastElement = divElement;
 
-    var rootElement = document.body;
-    rootElement.appendChild(this.toastElement);
+    var rootElement = this.toast;
+    rootElement.appendChild(divElement);
 
     window.setTimeout(
       function () {
         // Remove the toast from DOM
-        this.removeElement(this.toastElement);
+        //this.removeElement(this.toastElement);
+        this.toast.removeChild(divElement);
       }.bind(this),
       3000
     ); // Binding `this` for function invocation
@@ -27,10 +35,7 @@ class T {
   removeElement(toastElement) {
     window.setTimeout(
       function () {
-        // Remove the element from the DOM, only when the parent node was not removed before.
-        if (toastElement.parentNode) {
-          toastElement.parentNode.removeChild(toastElement);
-        }
+        this.toast.removeChild(toastElement);
       }.bind(this),
       400
     );

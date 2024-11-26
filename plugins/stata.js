@@ -1,6 +1,7 @@
 "use strict";
 
 import Drawer from '../Drawer.js';
+import getSkins from './HeroSkins.js';
 
 let loader;
 
@@ -49,6 +50,7 @@ async function raidStatistic() {
     { name: "clanRaid_logBoss", args: {}, ident: "clanRaid_logBoss" },
     /*{ name: "clanGetWeeklyStat", args: {}, ident: "clanGetWeeklyStat" },*/
     { name: "topGet", args: { type: "arena", extraId: 0 }, ident: "topGet" },
+    { name: "titanGetAll", args: {}, ident: "titans" },
   ];
 
   const result = await Send(JSON.stringify({ calls }));
@@ -74,6 +76,7 @@ async function raidStatistic() {
     topArena: result.results[5].result.response.top.map((place) =>
       place.heroes.map((hero) => hero.id)
     ),
+    titans: result.results[6].result.response
   });
 }
 
@@ -156,7 +159,7 @@ class Statistics {
       });
   }
 
-  generate() {
+  async generate() {
     const tabs = document.querySelector("ul.wds-tabs");
     const tabbler = document.querySelector("div.tabber");
 
@@ -165,6 +168,18 @@ class Statistics {
 
     tabs.appendChild(t1);
     tabbler.appendChild(tc1);
+
+    //Nbnfys
+    let { tab: t2, tab_content: tc2 } = this.UpTitans();
+
+    tabs.appendChild(t2);
+    tabbler.appendChild(tc2);
+
+    //hero skins
+    let { tab: t3, tab_content: tc3 } = await this.Skins();
+
+    tabs.appendChild(t3);
+    tabbler.appendChild(tc3);
 
     // ГИ инфо
     let { tab, tab_content } = this.drawClanInfo();
@@ -396,6 +411,91 @@ class Statistics {
 
         tab_content.appendChild(r);
       });
+
+    return { tab, tab_content };
+  }
+
+  UpTitans() {
+    const titans = this.res.titans;
+    const { tab, tab_content } = this.createTab(`Титаны`);
+
+    const maxLevel = Math.max(...Object.values(lib.data.level.titan).map(x => x.level));
+    Object.values(titans)
+      .filter(titan => titan.level < maxLevel)
+      .map(t => ({id: t.id, count: (lib.data.level.titan[maxLevel].exp - lib.data.level.titan[t.level].exp)}))
+      .sort((a, b) => a.count - b.count)
+      .forEach(t => {
+        let r = document.createElement("div");
+        r.className = "row";
+
+        let c = document.createElement("div");
+        c.className = "cell col-3";
+        c.innerText = cheats.translate(`LIB_HERO_NAME_${t.id}`);
+        r.appendChild(c);
+
+        c = document.createElement("div");
+        c.className = `cell col-1`;
+        c.innerText = t.count;
+        r.appendChild(c);
+
+        tab_content.appendChild(r);
+      });
+
+    return { tab, tab_content };
+  }
+
+  async Skins() {
+    const skind = await getSkins();
+    const { tab, tab_content } = this.createTab(`Облики`);
+
+    // Создаем табы
+    let tblr = document.createElement("div");
+    tblr.className = "tabber wds-tabber";
+
+    let tsw = document.createElement("div");
+    tsw.className = "wds-tabs__wrapper";
+    tblr.appendChild(tsw);
+
+    let ts = document.createElement("ul");
+    ts.className = "wds-tabs";
+    tsw.appendChild(ts);
+
+    tab_content.appendChild(tblr);
+
+    /*--------------------------------------*/
+    const f = (coin, sks) => {
+      const m = this.createTab(coin ? cheats.translate(`LIB_COIN_NAME_${coin}`) : "Фулл");
+
+      let d = document.createElement("div");
+      d.className = "table";
+  
+      sks.sort((a,b) => a.cost.coin[coin] - b.cost.coin[coin]).forEach(x => {
+        let r = document.createElement("div");
+        r.className = "row";
+
+        let c = document.createElement("div");
+        c.className = "cell col-3";
+        c.innerText = cheats.translate(`LIB_HERO_NAME_${x.id}`);
+        r.appendChild(c);
+
+        c = document.createElement("div");
+        c.className = `cell col-5`;
+        c.innerText = x.cost.coin ? x.cost.coin[coin] : "";
+        r.appendChild(c);
+
+        d.appendChild(r);
+        m.tab_content.appendChild(d);
+      })
+
+      return m;
+    }
+    const skins = Object.groupBy(skind, (x) => { if (x.cost.coin) { return Object.keys(x.cost?.coin)}})
+
+    Object.keys(skins).forEach(k => {
+      const m = f(k, skins[k]);
+      ts.appendChild(m.tab);
+      tblr.appendChild(m.tab_content);
+    })
 
     return { tab, tab_content };
   }

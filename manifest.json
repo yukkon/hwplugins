@@ -8,13 +8,13 @@
   },
   "content_scripts": [ {
     "js": [ "content.js" ],
-    "css": [ "./main.css", "./script.css", "./stats.css" ],
+    "css": [ "./main.css", "./script.css", "./stats.css", "./toastify.css" ],
     "matches": [ "https://www.hero-wars.com/*", "https://hero-wars.com/*" ],
      "run_at": "document_end"
   }],
   "permissions": [ "scripting", "activeTab", "storage", "unlimitedStorage", "notifications", "contextMenus" ],
   "web_accessible_resources": [{
-      "resources": [ "main.js", "ResourceLoader.js", "Drawer.js", "plugins/*" ],
+      "resources": [ "main.js", "ResourceLoader.js", "Drawer.js", "TaskManager.js", "plugins/*" ],
       "matches": [ "https://www.hero-wars.com/*", "https://hero-wars.com/*", "https://heroes-wb.nextersglobal.com/*" ],
       "run_at": "document_end"
   }]
