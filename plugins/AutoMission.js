@@ -14,8 +14,8 @@ const onclick = async (e) => {
   //a.start(21) // маркус 21
   //a.start(64) // Август 64
   //a.start(56) // Амира 56
-  //a.start(4) // астарот 4
-  a.start(40) // айзек 55 небула 40
+  a.start(4) // астарот 4
+  //a.start(40) // айзек 55 небула 40
 }
 
 
@@ -95,10 +95,10 @@ class AutoMiss {
     let used = 0;
     const vipLevel = Math.max(...lib.data.level.vip.filter(l => l.vipPoints <= +this.userInfo.vipPoints).map(l => l.level));
     let times = 1;
-    while (stamina > mission.cost && count <= res.count) {
-      if (parseInt(stamina/mission.cost) > 10 && vipLevel >= 5) {
-        times = 10;
-      }
+    if (vipLevel >= 5) {
+      times = 10;
+    }
+    while (stamina > times*mission.cost && count <= res.count) {
       let response = await Send({calls: [{name: "missionRaid", args: { id: mission.id, times }, ident: "body" } ] }).then(
         x => {
           if (x.error) {
@@ -149,7 +149,7 @@ class AutoMiss {
       })
       window.setProgress(`Получено: ${count} ${n[0]}: израсходовано энки ${used}`)  
     }
-    window.setProgress(`Затрачено энки: ${used}`)
+    window.setProgress(`Получено: ${count} ${n[0]}: израсходовано энки ${used}`)  
   }
 
   f0(obj, count = 1) {
