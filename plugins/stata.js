@@ -469,7 +469,14 @@ class Statistics {
       let d = document.createElement("div");
       d.className = "table";
   
-      sks.sort((a,b) => a.cost.coin[coin] - b.cost.coin[coin]).forEach(x => {
+      sks.sort((a,b) => {
+          if (a.cost?.coin && b.cost?.coin) {
+            return a.cost?.coin[coin] - b.cost?.coin[coin]
+          } else {
+            return 0
+          }
+        })
+        .forEach(x => {
         let r = document.createElement("div");
         r.className = "row";
 

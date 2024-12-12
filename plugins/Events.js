@@ -1,10 +1,9 @@
 "use strict";
 
-const injectFunction = async (l) => {
+const injectFunction = async () => {
   const div = document.createElement("div");
     div.className = "menu_button";
     div.innerHTML = `События`;
-    div.dataset.id = i.id;
     div.addEventListener("click", onclick);
     document.querySelector(".main_menu").appendChild(div);
 };
@@ -108,7 +107,7 @@ const xBb = {
         break;
       case "heroAmountStarsById":
         f[0] = a.map(x => x.amount);
-        f[1] = this.kVa(a.stateFunc.args.heroId);
+        f[1] = this.kVa(a[0].stateFunc.args.heroId);
     }
     return f;
   },

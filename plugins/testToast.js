@@ -9,8 +9,10 @@ const injectFunction = (data) => {
   document.querySelector(".main_menu").appendChild(div);
 }
 
+const rnd = () => crypto.getRandomValues(new Uint8Array(10)).reduce((acc, val) => acc + val.toString(16))
+
 const onclick = async (e) => {
-  toast.success('alarma')
+  toast.success(rnd())
 }
 
 export default injectFunction;

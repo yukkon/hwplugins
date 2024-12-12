@@ -112,6 +112,7 @@ const onclick = async (e) => {
   };
 
   canvas.onclick = (e) => { 
+    //[{"name": "seasonAdventure_exploreLevel", "args": {"seasonAdventureId": 6, "levelId": 716 }, "context": { "actionTs": 1283688},"ident": "body"}]
     if (!window.drag) {
       const offset = {x: e.clientX, y: e.clientY};
       console.log(offset)
@@ -150,6 +151,7 @@ class A {
       }, {});
       let l = levels
       .map(el => ({
+        level: el.level,
         ...map[el.level],
         processed: processed[el.level],
         tile: el.clientData.graphics.tile,

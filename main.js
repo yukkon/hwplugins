@@ -250,37 +250,42 @@ const isChecked = (key) => {
 };
 
 function runPlugins() {
-  import("./ResourceLoader.js").then(m => {
+  
+  import("./ResourceLoader.js")
+  .then(m => {
     let l = new m.default(NXFlashVars);
     l.load([
-      { key: "assets/js/gui/dialog_basic.rsx" },
-      { key: "assets/hero_icons_only/hero_icons_only.xml" },
-      { key: "assets/js/titan_icons/titan_icons.rsx" },
-      { key: "assets/js/pet_icons/pet_icons.rsx" },
-      { key: "assets/js/gui/titan_artifact_icons.rsx" },
-      { key: "assets/js/banner/banner_icons.rsx" },
-      { key: "assets/inventory_icons/banner_stone_icons.xml" },
-      { key: "assets/js/team_flags/team_flag_icons.rsx" },
-      { key: "assets/inventory_icons/scroll_icons.xml" },
-      { key: "assets/inventory_icons/gear_icons_05.xml" },
-      { key: "assets/inventory_icons/gear_icons_2_05.xml" },
-      { key: "assets/js/gui/dialog_season_adventure_tiles.rsx" },
-      { key: "assets/inventory_icons/ascension_gear_icons.xml" },
-      { key: "assets/js/gui/pet_gear.rsx" },
-      { key: "assets/inventory_icons/consumable.xml" },
-      { key: "assets/quest_icons/quest_icons.xml" },
+      { key: "js/gui/dialog_basic.rsx" },
+      { key: "hero_icons_only/hero_icons_only.xml" },
+      { key: "js/titan_icons/titan_icons.rsx" },
+      { key: "js/pet_icons/pet_icons.rsx" },
+      { key: "js/gui/titan_artifact_icons.rsx" },
+      { key: "js/team_flags/team_flag_icons.rsx" },
+      { key: "inventory_icons/banner_stone_icons.xml" },
+      { key: "js/team_flags/team_flag_icons.rsx" },
+      { key: "inventory_icons/scroll_icons.xml" },
+      { key: "inventory_icons/gear_icons_05.xml" },
+      { key: "inventory_icons/gear_icons_2_05.xml" },
+      { key: "js/gui/dialog_season_adventure_tiles.rsx" },
+      { key: "inventory_icons/ascension_gear_icons.xml" },
+      { key: "js/gui/pet_gear.rsx" },
+      { key: "inventory_icons/consumable.xml" },
+      { key: "quest_icons/quest_icons.xml" },
     ])
     .then(p => {
       window.XXX = p;
       import("./plugins/stata.js").then(m => m.default(p));
       import("./plugins/island.js").then(m => m.default(p));
-      import("./plugins/Events.js").then(m => m.default(p));
-      import("./plugins/fixAsgardBattle.js").then(m => m.default(p));
-      import("./plugins/slaveFixBattle.js").then(m => m.default(p));
-      import("./plugins/InvasionAutoBoss.js").then(m => m.default(p));
-      import("./plugins/testToast.js").then(m => m.default(p));
+      //import("./plugins/fixAsgardBattle.js").then(m => m.default(p));
+      //import("./plugins/slaveFixBattle.js").then(m => m.default(p));
+      //import("./plugins/InvasionAutoBoss.js").then(m => m.default(p));
       //import("./plugins/battlePassRewards.js").then(m => m.default(p));
-      import("./plugins/AutoMission.js").then(m => m.default(p));
+      import("./plugins/SavePacks.js").then(m => m.default(p));
     });
   });
+  
+  import("./plugins/Events.js").then(m => m.default());
+  import("./plugins/AutoMission.js").then(m => m.default());
+  import("./plugins/testToast.js").then(m => m.default());
+  import("./plugins/AutoMission2.js").then(m => m.default());
 }

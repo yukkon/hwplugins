@@ -1,3 +1,6 @@
+"use strict";
+
+/*
 onmessage = async (evt) => {
   try {
     const canvas = evt.data;
@@ -12,4 +15,16 @@ onmessage = async (evt) => {
     postMessage("unsupported browser");
     throw e;
   }
+};
+*/
+
+import d from "../DrawerNew.js";
+
+let drawer = new d(XXX);
+
+onmessage = async (e) => {
+  console.log('Worker: draw');
+
+  let url = await drawer.draw(e.data.canvas, e.data.data);
+  postMessage({id: e.data.id, url})
 };

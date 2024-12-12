@@ -3127,7 +3127,7 @@ class vfe {
   }
 }
 
-class Xx {
+class Xx2 {
   constructor(vars) {
     (this.cachedImages = new Map()),
     (this.NXFlashVars = vars)

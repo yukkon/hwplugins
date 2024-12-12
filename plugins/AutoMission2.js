@@ -9,9 +9,9 @@ const injectFunction = async (data) => {
   vipLevel = Math.max(...lib.data.level.vip.filter(l => l.vipPoints <= +userInfo.vipPoints).map(l => l.level));
   const div = document.createElement("div");
 
-  if (vipLevel >= 1) {
+  if (vipLevel) {
     div.className = "menu_button";
-    div.innerHTML = `Автофарм`;
+    div.innerHTML = `тест авторесурс`;
     div.dataset.id = i.id;
     div.addEventListener("click", onclick);
     document.querySelector(".main_menu").appendChild(div);
@@ -27,7 +27,7 @@ const map = {
 }
 
 const onclick = async (e) => {
-  a = new AutoMiss();
+  a = new AutoMiss2();
 
   const b = document.querySelector(".PopUp_back");
 
@@ -109,7 +109,7 @@ const onclick = async (e) => {
   });
 }
 
-class AutoMiss {
+class AutoMiss2 {
   constructor() {
     this.myHeroes = undefined;
     this.inventory = undefined;
@@ -128,45 +128,6 @@ class AutoMiss {
     if (!this.inventory) {
       this.inventory = await Send('{"calls":[{"name":"inventoryGet","args":{},"ident":"body"}]}').then(r => r.results[0].result.response)
     }
-    if (!this.missions) {
-      this.missions = await Send('{"calls":[{"name":"missionGetAll","args":{},"ident":"body"}]}').then(r => r.results[0].result.response)
-    }
-    if (!this.availableMissionsToRaid) {
-      this.availableMissionsToRaid = Object.values(this.missions).filter(mission => mission.stars === 3).map(mission => mission.id);
-    }
-  
-    if (!this.Reward2Mission) {
-      this.Reward2Mission = Object.values(lib.data.mission).reduce((acc, mission) => {
-        if (!this.availableMissionsToRaid.includes(mission.id)) {
-          return acc;
-        }
-      
-        const enemies = mission.normalMode.waves.map(wave => wave.enemies).flat();
-        const drop = enemies.filter(enemy => !!enemy.drop?.length).map(enemy => enemy.drop).flat();
-        const reward = drop.filter(d => d.chance > 0).map(d => d.reward);
-      
-        reward.forEach(r => {
-          Object.keys(r).forEach(inventoryKey => {
-            if (!acc[inventoryKey]) {
-              acc[inventoryKey] = {}
-              Object.keys(r[inventoryKey]).forEach(inventoryItem => {
-                acc[inventoryKey][inventoryItem] = [mission.id]
-              })
-            } else {
-              Object.keys(r[inventoryKey]).forEach(inventoryItem => {
-                if(!acc[inventoryKey][inventoryItem]) {
-                  acc[inventoryKey][inventoryItem] = [mission.id]
-                } else {
-                  acc[inventoryKey][inventoryItem].push(mission.id)
-                }
-              })
-            }
-          })
-        })
-      
-        return acc;
-      },{})
-    }
 
     const hero = Object.values(this.myHeroes).find(h => h.id == heroId)
     const slots = getHeroItemsToNextColor(hero);
@@ -175,71 +136,10 @@ class AutoMiss {
       return lib.data.hero[hero.id].color[hero.color].items.reduce((acc, val, ind) => {acc[val] = hero.slots[ind] ?? 1; return acc}, {});
     }
     const res = this.f0({gear: slots});
-    console.log("требуемый ресурс", res); //  {"fragmentGear": "167", count: 32}
-    const missions = this.searchMissions(res).map(id => lib.data.mission[id]).filter(m => !m.isHeroic).map(x => ({id: x.id, cost: x.normalMode.teamExp}));
-    console.log("Возможные миссии", missions)
 
-    const mission = missions.find(x => x.id == Math.max(...missions.map(y => y.id)))
-    let count = 0;
-    let stamina = userInfo.refillable.find(x => x.id == 1).amount;
-    let used = 0;
-    const vipLevel = Math.max(...lib.data.level.vip.filter(l => l.vipPoints <= +userInfo.vipPoints).map(l => l.level));
-    let times = 1;
-    if (vipLevel >= 5) {
-      times = 10;
-    }
-    while (stamina > times*mission.cost && count < res.count) {
-      let response = await Send({calls: [{name: "missionRaid", args: { id: mission.id, times }, ident: "body" } ] }).then(
-        x => {
-          if (x.error) {
-            console.error(x.error);
-            return {};
-          }
-          return x.results[0].result.response;
-        });
+    console.log("требуемый ресурс", res); //  {"fragmentGear": "167", count: 32} => {key: "fragmentGear", value: "167", count: 32}
 
-      let c = Object.values(response).reduce((acc,reward) => {
-        acc += Object.keys(reward).reduce((acc2, object) => {
-          if (res[object]) {
-            let o = Object.keys(reward[object]).find(x => x == res[object])
-            if (o) {
-              acc2 += reward[object][o]
-            }
-          }
-          return acc2;
-        }, 0)
-        return acc;
-      }, 0)
-    
-      count += c;
-      stamina -= mission.cost * times;
-      used += mission.cost * times;
-
-      const n = Object.keys(res).map(x => {
-        var name;
-        switch (x) {
-          case 'fragmentGear':
-            name = `Фрагмент ${cheats.translate(`LIB_GEAR_NAME_${res[x]}`)}`
-            break;
-          case 'fragmentScroll':
-            name = `Фрагмент ${cheats.translate(`LIB_SCROLL_NAME_${res[x]}`)}`
-            break;
-          case 'gear':
-            name = cheats.translate(`LIB_GEAR_NAME_${id}`)
-            break;
-          case 'scroll':
-            name = cheats.translate(`LIB_SCROLL_NAME_${id}`)
-            break;
-          default:
-            name = ''
-            break;
-        }
-        return name;
-      })
-      window.setProgress(`Получено: ${count}/${res.count} ${n[0]}<br> израсходовано энки ${used} (${used/count})`)  
-    }
-    window.setProgress(`Получено: ${count}/${res.count}<br> израсходовано энки ${used} (${used/count})`)
-    console.log(`Получено: ${count}: израсходовано энки ${used} (${used/count})`)  
+    window.setProgress(`Необходимо: ${res.count} ${res.key.indexOf('fragmant') ? "фрагмент": ""} ${cheats.translate(`LIB_${res.key.replace('fragment', '').toUpperCase()}_NAME_${res.value}`)} `)  
   }
 
   f0(obj, count = 1) {
@@ -259,9 +159,9 @@ class AutoMiss {
             } else {
               const capitalized = item.charAt(0).toUpperCase() + item.slice(1)
               if (lib.data.inventoryItem[item][id]?.fragmentMergeCost) {
-                res = {[`fragment${capitalized}`]: id, count: obj[item][id] * count * lib.data.inventoryItem[item][id]?.fragmentMergeCost?.fragmentCount - (this.inventory[`fragment${capitalized}`][id] || 0)};
+                res = {key:`fragment${capitalized}`, value: id, count: obj[item][id] * count * lib.data.inventoryItem[item][id]?.fragmentMergeCost?.fragmentCount - (this.inventory[`fragment${capitalized}`][id] || 0)};
               } else {
-                res = {[item]: id, count: obj[item][id]*count - (this.inventory[`fragment${capitalized}`][id] || 0)};
+                res = {key: [item], value: id, count: obj[item][id]*count - (this.inventory[`fragment${capitalized}`][id] || 0)};
               }
             }
           }
