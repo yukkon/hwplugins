@@ -255,22 +255,27 @@ function runPlugins() {
   .then(m => {
     let l = new m.default(NXFlashVars);
     l.load([
-      { key: "js/gui/dialog_basic.rsx" },
       { key: "hero_icons_only/hero_icons_only.xml" },
+      
+      { key: "js/gui/dialog_basic.rsx" },
+      { key: "js/gui/titan_artifact_icons.rsx" },
+      { key: "js/gui/dialog_season_adventure_tiles.rsx" },
+      { key: "js/gui/dialog_season_adventure_tiles_new.rsx" },
+      { key: "js/gui/pet_gear.rsx" },
+      
       { key: "js/titan_icons/titan_icons.rsx" },
       { key: "js/pet_icons/pet_icons.rsx" },
-      { key: "js/gui/titan_artifact_icons.rsx" },
       { key: "js/team_flags/team_flag_icons.rsx" },
+
       { key: "inventory_icons/banner_stone_icons.xml" },
-      { key: "js/team_flags/team_flag_icons.rsx" },
       { key: "inventory_icons/scroll_icons.xml" },
       { key: "inventory_icons/gear_icons_05.xml" },
       { key: "inventory_icons/gear_icons_2_05.xml" },
-      { key: "js/gui/dialog_season_adventure_tiles.rsx" },
       { key: "inventory_icons/ascension_gear_icons.xml" },
-      { key: "js/gui/pet_gear.rsx" },
       { key: "inventory_icons/consumable.xml" },
+
       { key: "quest_icons/quest_icons.xml" },
+      { key: "quest_icons2/quest_icons2.xml" }
     ])
     .then(p => {
       window.XXX = p;

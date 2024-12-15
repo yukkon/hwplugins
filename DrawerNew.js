@@ -176,27 +176,16 @@ class DrawerNew {
   }
 
   draw(data) {
-    let width = (!!data.attackers[0].color) ?
+    let width = (!!data.attackers[0]?.color) ?
         105 * data.attackers.length +
         (data.pet ? 105 : 0) +
         (data.banner ? 105 : 0)
-    : 105 * data.attackers.length + 105 * data.spirit.length;
+    : 105 * data.attackers.length + 105 * (data.spirit?.length ?? 0);
     let height = 146
 
     this.#canvas = new OffscreenCanvas(width, height);
     this.#ctx = this.#canvas.getContext("2d");
-/*
-    if (!!data.attackers[0].color) {
-      this.#canvas.width =
-        105 * data.attackers.length +
-        (data.pet ? 105 : 0) +
-        (data.banner ? 105 : 0);
-    } else {
-      this.#canvas.width =
-        105 * data.attackers.length + 105 * data.spirit.length;
-    }
-    */
-    this.#canvas.height = 146;
+    this.#canvas.height = height;
 
     this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
 
@@ -228,13 +217,16 @@ class DrawerNew {
     if (type == "hero") {
       k = this.map[type].background(data.color);
       im = this.#x.cachedImages.get(k);
-
-      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * (i + add), 10, 80, 80);
+      if (im) {
+        this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * (i + add), 10, 80, 80);
+      }
     }
     // icon
     k = this.map[type].icon(data.id);
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 7 + 105 * (i + add), 12, 80, 80);
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 7 + 105 * (i + add), 12, 80, 80);
+    }
     // border
     if (type == "hero") {
       k = this.map[type].border(data.color);
@@ -242,28 +234,22 @@ class DrawerNew {
       k = this.map[type].border(data.id, data.element);
     }
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * (i + add), 4, 94, 94);
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * (i + add), 4, 94, 94);
+    }
     // stars
     if (data.star == 6) {
       im = this.#x.cachedImages.get(this.map.absolute);
-      this.#ctx.drawImage(
-        im.image, im.x, im.y, im.width, im.height,
-        9 + 105 * (i + add),
-        69,
-        im.width + 10,
-        im.height
-      );
+      if (im) {
+        this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * (i + add), 69, im.width + 10, im.height);
+      }
     } else {
       im = this.#x.cachedImages.get(this.map.star);
-      [...Array(data.star)].forEach((_, j) => {
-        this.#ctx.drawImage(
-          im.image, im.x, im.y, im.width, im.height,
-          (94 - 17 * data.star) / 2 + 17 * j + 105 * (i + add),
-          69,
-          20,
-          20
-        );
-      });
+      if (im) {
+        [...Array(data.star)].forEach((_, j) => {
+          this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, (94 - 17 * data.star) / 2 + 17 * j + 105 * (i + add), 69, 20, 20);
+        });
+      }
     }
     // level border
     if (type == "hero") {
@@ -272,8 +258,9 @@ class DrawerNew {
       k = this.map.level_base;
     }
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * (i + add), 2, 42, 28);
-
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * (i + add), 2, 42, 28);
+    }
     // level
     this.#ctx.font = "bold 18px Arial";
     this.#ctx.fillStyle = "white";
@@ -284,7 +271,9 @@ class DrawerNew {
     if (!!data.petId) {
       k = this.map.pet.small(data.petId);
       im = this.#x.cachedImages.get(k);
-      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 68 + 105 * (i + add), 2, 35, 34);
+      if (im) {
+        this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 68 + 105 * (i + add), 2, 35, 34);
+      }
     }
     // power
     this.#ctx.font = "bold 18px Arial";
@@ -301,12 +290,7 @@ class DrawerNew {
       //bg re
       if (!data.state.isDead) {
         this.#ctx.fillStyle = "#2BC61A";
-        this.#ctx.fillRect(
-          106 * (i + add),
-          120,
-          (89 * data.state.hp) / data.state.maxHp,
-          6
-        );
+        this.#ctx.fillRect(106 * (i + add), 120, (89 * data.state.hp) / data.state.maxHp, 6);
       }
       //border
       this.#ctx.strokeStyle = "#5D490C"; //3D2711
@@ -320,12 +304,7 @@ class DrawerNew {
       // re
       if (!data.state.isDead) {
         this.#ctx.fillStyle = "#EACB0A";
-        this.#ctx.fillRect(
-          106 * (i + add),
-          133,
-          (89 * data.state.energy) / 1000,
-          6
-        );
+        this.#ctx.fillRect(106 * (i + add), 133, (89 * data.state.energy) / 1000, 6);
       }
       this.#ctx.strokeStyle = "#5D490C"; //3D2711
       this.#ctx.strokeRect(106 * (i + add), 133, 89, 6);
@@ -337,37 +316,41 @@ class DrawerNew {
     // bg
     let k = this.map.pet.background(data.color);
     let im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 4 + 105 * add, 9, 80, 80);
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 4 + 105 * add, 9, 80, 80);
+    }
     // icon
     k = this.map.pet.icon(data.id);
     im = this.#x.cachedImages.get(k);
-    if (!!im) {
+    if (im) {
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 7 + 105 * add, 10, 80, 80);
     }
     // border
     k = this.map.pet.border(data.color);
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * add, 4, 94, 94);
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * add, 4, 94, 94);
+    }
     // stars
     if (data.star == 6) {
       im = this.#x.cachedImages.get(this.map.absolute);
-      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * add, 69, im.width + 10, im.height);
+      if (im) {
+        this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * add, 69, im.width + 10, im.height);
+      }
     } else {
       im = this.#x.cachedImages.get(this.map.star);
-      [...Array(data.star)].forEach((_, j) => {
-        this.#ctx.drawImage(
-          im.image, im.x, im.y, im.width, im.height,
-          20 + 105 * add + ((47 - 17 * data.star) / 2 + 17 * j),
-          69,
-          20,
-          20
-        );
-      });
+      if (im) {
+        [...Array(data.star)].forEach((_, j) => {
+          this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 20 + 105 * add + ((47 - 17 * data.star) / 2 + 17 * j), 69, 20, 20);
+        });
+      }
     }
     // level border
     k = this.map.level(data.color);
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * add, 2, 42, 28);
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 26 + 105 * add, 2, 42, 28);
+    }
 
     // level
     this.#ctx.font = "bold 18px Arial";
@@ -388,34 +371,35 @@ class DrawerNew {
     // icon
     let k = this.map.spirit.icon(data.type);
     let im = this.#x.cachedImages.get(k);
-
-    if (!!im) {
+    if (im) {
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9 + 105 * i, 12, 80, 80);
     }
     // border
     k = this.map.spirit.border(data.level);
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * i, 10, 90, 90);
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 6 + 105 * i, 10, 90, 90);
+    }
     // stars
     if (data.star == 6) {
       im = this.#x.cachedImages.get(this.map.absolute);
-      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 18 + 105 * i, 69, im.width, im.height);
+      if (im) {
+        this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 18 + 105 * i, 69, im.width, im.height);
+      }
     } else {
       im = this.#x.cachedImages.get(this.map.star);
-      [...Array(data.star)].forEach((_, j) => {
-        this.#ctx.drawImage(
-          im.image, im.x, im.y, im.width, im.height,
-          105 * i + ((105 - 17 * data.star) / 2 + 17 * j),
-          69,
-          20,
-          20
-        );
-      });
+      if (im) {
+        [...Array(data.star)].forEach((_, j) => {
+          this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 105 * i + ((105 - 17 * data.star) / 2 + 17 * j), 69, 20, 20);
+        });
+      }
     }
     // level border
     k = this.map.spirit.level(data.level);
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 30 + 105 * i, 2, im.width, im.height);
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 30 + 105 * i, 2, im.width, im.height);
+    }
     // level
     this.#ctx.fillText(data.level, 51 + 105 * i, 23);
   }
@@ -424,15 +408,15 @@ class DrawerNew {
     // icon
     let k = this.map.banner.icon(data.id);
     let im = this.#x.cachedImages.get(k);
-
-    if (!!im) {
+    if (im) {
       this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 9, 12, 80, 80);
     }
     // border
     k = this.map.banner.border;
     im = this.#x.cachedImages.get(k);
-    this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 0, 4, 94, 94);
-
+    if (im) {
+      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, 0, 4, 94, 94);
+    }
     this.#drawStones(data.slots);
   }
 
@@ -446,13 +430,15 @@ class DrawerNew {
 
       let x = c + 30 * i + (30 * (3 - c)) / (c + 1);
 
-      if (!!im) {
+      if (im) {
         this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x, 80, 30, 30);
       }
       // border
       k = this.map.stone.border(st.color);
       im = this.#x.cachedImages.get(k);
-      this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x, 80, 30, 30);
+      if (im) {
+        this.#ctx.drawImage(im.image, im.x, im.y, im.width, im.height, x, 80, 30, 30);
+      }
     });
   }
 }

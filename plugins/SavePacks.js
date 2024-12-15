@@ -76,15 +76,16 @@ async function result(id) {
   const a = Object.values(battle.replay.attackers).map(({id, level, color, star, power, petId}) => ({id, level, color, star, power, petId}))
   const b = Object.values(battle.replay.defenders[0]).map(({id, level, color, star, power, petId}) => ({id, level, color, star, power, petId}))
   
+  const attaker = battle.users[battle.replay.userId]
+  const defender = Object.values(battle.users).find(u => u.id != battle.replay.userId)
+
   if (a) {
     const attackers = a.filter(u => u.id < 100);
-    const pet = a.find(u => u.id > 100);
+    const pet = a.find(u => Object.values(loader.lib.pet).map(p => p.id).includes(u.id));
     const banner = battle.replay.effects.attackersBanner;
     //const defenseState = user.defenseState;
 
-    const data = { attackers, pet, banner }
-  
-    drawer.draw(data).then(u => {
+    drawer.draw({ attackers, pet, banner }).then(u => {
       const im = document.querySelector(`#iatt`)
       if (!!im) {
         im.src = u;
@@ -93,7 +94,7 @@ async function result(id) {
   }
   if (b) {
     const attackers = b.filter(u => u.id < 100);
-    const pet = b.find(u => u.id > 100);
+    const pet = a.find(u => Object.values(loader.lib.pet).map(p => p.id).includes(u.id));
     const banner = battle.replay.effects.defendersBanner;
     //const defenseState = user.defenseState;
 
@@ -105,8 +106,5 @@ async function result(id) {
     })
   }
 }
-
-const rnd = () => crypto.getRandomValues(new Uint8Array(10)).reduce((acc, val) => acc + val.toString(16))
-
 
 export default injectFunction;
