@@ -115,6 +115,7 @@ class AutoMiss {
     this.inventory = undefined;
     this.missions = undefined;
     this.availableMissionsToRaid = undefined;
+    this.userInfo = undefined;
 	}
 
   get Heroes() {
@@ -124,6 +125,9 @@ class AutoMiss {
 	async start(heroId) {
     if (!this.myHeroes) {
       this.myHeroes = await Send('{"calls":[{"name":"heroGetAll","args":{},"ident":"body"}]}').then(r => r.results[0].result.response)
+    }
+    if (!this.userInfo) {
+      this.userInfo = await Send('{"calls":[{"name":"userGetInfo","args":{},"ident":"body"}]}').then(r => r.results[0].result.response)
     }
     if (!this.inventory) {
       this.inventory = await Send('{"calls":[{"name":"inventoryGet","args":{},"ident":"body"}]}').then(r => r.results[0].result.response)
@@ -182,9 +186,9 @@ class AutoMiss {
 
       const mission = missions.find(x => x.id == Math.max(...missions.map(y => y.id)))
       let count = 0;
-      let stamina = userInfo.refillable.find(x => x.id == 1).amount;
+      let stamina = this.userInfo.refillable.find(x => x.id == 1).amount;
       let used = 0;
-      const vipLevel = Math.max(...lib.data.level.vip.filter(l => l.vipPoints <= +userInfo.vipPoints).map(l => l.level));
+      const vipLevel = Math.max(...lib.data.level.vip.filter(l => l.vipPoints <= +this.userInfo.vipPoints).map(l => l.level));
       let times = 1;
       if (vipLevel >= 5) {
         times = 10;
@@ -256,8 +260,6 @@ class AutoMiss {
     return res;
   }
 
-  // {fragmentHero: 20}
-  // {"fragmentGear": "167"}
   // {key: "fragmentGear", value: "167", count: 50}
   searchMissions(item) {
     let out = [];
