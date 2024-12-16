@@ -138,8 +138,9 @@ class AutoMiss2 {
     const res = this.f0({gear: slots});
 
     console.log("требуемый ресурс", res); //  {"fragmentGear": "167", count: 32} => {key: "fragmentGear", value: "167", count: 32}
-
-    window.setProgress(`Необходимо: ${res.count} ${res.key.indexOf('fragmant') ? "фрагмент": ""} ${cheats.translate(`LIB_${res.key.replace('fragment', '').toUpperCase()}_NAME_${res.value}`)} `)  
+    if (res) {
+      window.setProgress(`Необходимо: ${res.count} ${res.key.indexOf('fragmant') ? "фрагмент": ""} ${cheats.translate(`LIB_${res.key.replace('fragment', '').toUpperCase()}_NAME_${res.value}`)} `)  
+    }
   }
 
   f0(obj, count = 1) {
@@ -147,9 +148,9 @@ class AutoMiss2 {
     delete obj.gold;
     let res = undefined;
     for (let item of Object.keys(obj)) { //gear scroll
-      if (res) break;
+      if (res?.count > 0) break;
       for (let id of Object.keys(obj[item])) { // 102
-        if (res) break;
+        if (res?.count > 0) break;
         if (obj[item][id]*count != 0) {
           const countInv = this.inventory[item][id] ?? 0;
           if (obj[item][id]*count > countInv) {
