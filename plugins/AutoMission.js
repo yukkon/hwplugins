@@ -201,8 +201,8 @@ class AutoMiss {
 
         let c = Object.values(response).reduce((acc,reward) => {
           acc += Object.keys(reward).reduce((acc2, object) => {
-            if (res[object]) {
-              let o = Object.keys(reward[object]).find(x => x == res[object])
+            if (res.key == object) {
+              let o = Object.keys(reward[object]).find(x => x == res.value)
               if (o) {
                 acc2 += reward[object][o]
               }
@@ -220,6 +220,8 @@ class AutoMiss {
       }
       window.setProgress(`Получено: ${count}/${res.count} ${res.key.indexOf('fragmant') ? "фрагмент": ""} ${cheats.translate(`LIB_${res.key.replace('fragment', '').toUpperCase()}_NAME_${res.value}`)} <br> израсходовано энки ${used} (${used/count})`)  
       console.log(`Получено: ${count}/${res.count} ${res.key.indexOf('fragmant') ? "фрагмент": ""} ${cheats.translate(`LIB_${res.key.replace('fragment', '').toUpperCase()}_NAME_${res.value}`)} <br> израсходовано энки ${used} (${used/count})`)  
+    } else {
+      window.setProgress(`Можно апнуть`)  
     }
   }
 
@@ -241,8 +243,10 @@ class AutoMiss {
               const capitalized = item.charAt(0).toUpperCase() + item.slice(1)
               if (lib.data.inventoryItem[item][id]?.fragmentMergeCost) {
                 res = {key: `fragment${capitalized}`, value: id, count: obj[item][id] * count * lib.data.inventoryItem[item][id]?.fragmentMergeCost?.fragmentCount - (this.inventory[`fragment${capitalized}`][id] || 0)};
+                if (res.count == 0) res = undefined;
               } else {
                 res = {key: item, value: id, count: obj[item][id]*count - (this.inventory[`fragment${capitalized}`][id] || 0)};
+                if (res.count == 0) res = undefined;
               }
             }
           }
@@ -254,14 +258,13 @@ class AutoMiss {
 
   // {fragmentHero: 20}
   // {"fragmentGear": "167"}
+  // {key: "fragmentGear", value: "167", count: 50}
   searchMissions(item) {
     let out = [];
     if (item) {
-      Object.keys(item).forEach(k => {
-        if (this.Reward2Mission[k]) {
-          out = this.Reward2Mission[k][item[k]]??[]
+        if (this.Reward2Mission[item.key]) {
+          out = this.Reward2Mission[item.key][item.value]??[]
         }
-      })
     }
     return out;
   }
