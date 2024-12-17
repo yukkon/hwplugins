@@ -94,7 +94,7 @@ async function result(id) {
   }
   if (b) {
     const attackers = b.filter(u => u.id < 100);
-    const pet = a.find(u => Object.values(loader.lib.pet).map(p => p.id).includes(u.id));
+    const pet = b.find(u => Object.values(loader.lib.pet).map(p => p.id).includes(u.id));
     const banner = battle.replay.effects.defendersBanner;
     //const defenseState = user.defenseState;
 
