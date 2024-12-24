@@ -43,6 +43,8 @@ window.setProgress = (text) => {
   }, 7000);
 }
 
+window.hideProgress = () => {}
+
 window.week = () => {
   let date = new Date();
   date.setHours(0, 0, 0, 0);
@@ -292,5 +294,4 @@ function runPlugins() {
   import("./plugins/Events.js").then(m => m.default());
   import("./plugins/AutoMission.js").then(m => m.default());
   import("./plugins/testToast.js").then(m => m.default());
-  import("./plugins/AutoMission2.js").then(m => m.default());
 }
