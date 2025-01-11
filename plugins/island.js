@@ -125,11 +125,52 @@ const onclick = async (e) => {
     e.stopPropagation();
   };
 
-  canvas.onclick = (e) => {
-    //[{"name": "seasonAdventure_exploreLevel", "args": {"seasonAdventureId": 6, "levelId": 716 }, "context": { "actionTs": 1283688},"ident": "body"}]
+  canvas.onclick = async (e) => {
     if (!window.drag) {
-      const offset = { x: e.clientX, y: e.clientY };
-      console.log(offset);
+      let c = a.array
+        .filter((el) => {
+          const x = el.x - a.offset.minx + 2 * a.hexRect.w;
+          const y = el.y - a.offset.miny + a.hexRect.h;
+          return (
+            Math.sqrt(Math.pow(x - e.offsetX, 2) + Math.pow(y - e.offsetY, 2)) <
+            2 * a.hexRect.h
+          );
+        })
+        .map((el) => {
+          const x = el.x - a.offset.minx + 2 * a.hexRect.w;
+          const y = el.y - a.offset.miny + a.hexRect.h;
+          const r = Math.sqrt(
+            Math.pow(x - e.offsetX, 2) + Math.pow(y - e.offsetY, 2)
+          );
+          return { ...el, dis: r };
+        });
+      const h = c.find((el) => el.dis == Math.min(...c.map((e) => e.dis)));
+      console.info("Click", h);
+      const near = a.array
+        .filter(
+          (el) =>
+            (el.q == h?.q + 1 && el.r == h?.r) ||
+            (el.q == h?.q + 1 && el.r == h?.r + 1) ||
+            (el.q == h?.q && el.r == h?.r + 1) ||
+            (el.q == h?.q - 1 && el.r == h?.r) ||
+            (el.q == h?.q - 1 && el.r == h?.r - 1) ||
+            (el.q == h?.q && el.r == h?.r - 1)
+        )
+        .some((el) => !!el.processed);
+
+      if (!h?.processed && !!h?.reward?.length && near) {
+        /*await Send({
+          calls: [
+            {
+              name: "seasonAdventure_processLevel",
+              args: { seasonAdventureId: a.id, levelId: h.level },
+              ident: "body",
+            },
+          ],
+        });
+        */
+        console.info("Call", { seasonAdventureId: a.id, levelId: h.level });
+      }
     }
   };
 
@@ -151,7 +192,7 @@ class A {
       this.ctx.lineWidth = 2;
     }
     this.canvas = canvas;
-
+    this.id = id;
     const island = this.loader.lib.seasonAdventure.list[id];
     const levels = Object.values(this.loader.lib.seasonAdventure.level).filter(
       (s) => s.season == id
@@ -393,7 +434,7 @@ class A {
 
           this.ctx.filter = "none";
         } else {
-          console.log("Ревард не найден", type, v)
+          console.log("Ревард не найден", type, v);
         }
         i++;
       });
