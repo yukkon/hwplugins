@@ -9,22 +9,24 @@ Object.defineProperty(Array.prototype, "last", {
   },
 });
 
-Object.defineProperty(Date.prototype, 'week', {
+Object.defineProperty(Date.prototype, "week", {
   get() {
-      let date = new Date(this.getTime());
-      date.setHours(0, 0, 0, 0);
+    let date = new Date(this.getTime());
+    date.setHours(0, 0, 0, 0);
 
-      let day1 = new Date(date.getFullYear(), 0, 1);
-      let days = Math.floor((date - day1) / (24 * 60 * 60 * 1000));
+    let day1 = new Date(date.getFullYear(), 0, 1);
+    let days = Math.floor((date - day1) / (24 * 60 * 60 * 1000));
 
-      let d = day1.getDay();
-      if (d == 0) { d = 7 }
+    let d = day1.getDay();
+    if (d == 0) {
+      d = 7;
+    }
 
-      let week = Math.ceil((d + days) / 7);
+    let week = Math.ceil((d + days) / 7);
 
-      return week;
-  }
-})
+    return week;
+  },
+});
 
 window.setProgress = (text) => {
   const popup = document.querySelector("div.scriptMenu_status");
@@ -35,15 +37,15 @@ window.setProgress = (text) => {
     popup.innerHTML = text;
   }
   if (popup.dataset.timeout) {
-    clearTimeout(popup.dataset.timeout)
+    clearTimeout(popup.dataset.timeout);
   }
   popup.dataset.timeout = setTimeout((_) => {
     popup.classList.add("scriptMenu_statusHide");
     popup.dataset.timeout = undefined;
   }, 7000);
-}
+};
 
-window.hideProgress = () => {}
+window.hideProgress = () => {};
 
 window.week = () => {
   let date = new Date();
@@ -69,7 +71,7 @@ window.applyFavor = (hero, petId) => {
   hero.favorPower = 11064;
   hero.petId = petId;
 
-  // additionalPower 
+  // additionalPower
   // добавили статы
   // добавили скил
 };
@@ -134,7 +136,7 @@ window.getHero = async (id, favor) => {
   return JSON.stringify(h);
 };
 
-import {toast} from './plugins/toast.js';
+import { toast } from "./plugins/toast.js";
 window.toast = toast;
 
 //import {toast} from './toast.js';
@@ -150,8 +152,7 @@ window.toast = toast;
 //ifu();
 
 import raid from "./plugins/asgard.js";
-import TaskManager from './TaskManager.js';
-
+import TaskManager from "./TaskManager.js";
 
 //import "./plugins/raidMission.js";
 //import "./plugins/fixAsgardBattle.js";
@@ -159,7 +160,6 @@ import TaskManager from './TaskManager.js';
 /*document.addEventListener("HWDataEvent", function(event) {
   import(`./plugins/${event.detail.type}.js`).then(m => m.default(event.detail.data)).catch(e => {});
 });*/
-
 
 // alternative to DOMContentLoaded
 document.onreadystatechange = function () {
@@ -179,29 +179,43 @@ document.onreadystatechange = function () {
 
         const maps = JSON.parse(localStorage.getItem("seasonAdventure")) || {};
         //{1: 2, 2: 2, 4: 4, 4: 4}
-        if (Object.values(lib?.data?.seasonAdventure?.list).length != Object.values(maps).length) {
+        if (
+          Object.values(lib?.data?.seasonAdventure?.list).length !=
+          Object.values(maps).length
+        ) {
           toast.info("Новый остров");
         } else {
-          const regs = Object.keys(lib?.data?.seasonAdventure?.list).every(m => 
-            lib?.data?.seasonAdventure?.list[m].map?.regions.length == maps[m]
-          )
+          const regs = Object.keys(lib?.data?.seasonAdventure?.list).every(
+            (m) =>
+              lib?.data?.seasonAdventure?.list[m].map?.regions.length == maps[m]
+          );
           if (!regs) {
             toast.info("Новый регион");
           }
         }
-        const o = Object.values(lib?.data?.seasonAdventure?.list).reduce((acc, val) => {acc[val.id]=Object.values(val.map.regions).length;return acc;}, {})
-        localStorage.setItem("seasonAdventure", JSON.stringify(o))
+        const o = Object.values(lib?.data?.seasonAdventure?.list).reduce(
+          (acc, val) => {
+            acc[val.id] = Object.values(val.map.regions).length;
+            return acc;
+          },
+          {}
+        );
+        localStorage.setItem("seasonAdventure", JSON.stringify(o));
 
         runPlugins();
 
         const now = new Date();
 
-        if (now.getDay() == 0 && now.getHours() > 19 && localStorage['userId'] === '13877391') {
+        if (
+          now.getDay() == 0 &&
+          now.getHours() > 19 &&
+          localStorage["userId"] === "13877391"
+        ) {
           asgard();
         }
 
         window.taskMan = new TaskManager(60);
-        toast.error('ALARMA');
+        toast.success("TaskManager activated");
       }
     };
     init();
@@ -210,37 +224,32 @@ document.onreadystatechange = function () {
 
 function blockCpu(ms) {
   var now = new Date().getTime();
-  var result = 0
-  while(true) {
-      result += Math.random() * Math.random();
-      if (new Date().getTime() > now +ms)
-          return;
-  }   
+  var result = 0;
+  while (true) {
+    result += Math.random() * Math.random();
+    if (new Date().getTime() > now + ms) return;
+  }
 }
-
 
 async function asgard() {
   const bosses = await raid();
 
   if (!!bosses) {
-    fetch("http://localhost:888/api/Application", {
+    fetch(`http://localhost:999/api/Asgard/${window.week()}`, {
       headers: {
         accept: "*/*",
         "content-type": "application/json",
       },
       referrer: "http://localhost:5181/swagger/index.html",
       referrerPolicy: "strict-origin-when-cross-origin",
-      body: JSON.stringify({
-        week: window.week(),
-        data: JSON.stringify(bosses),
-      }),
+      body: JSON.stringify(bosses),
       method: "POST",
       mode: "cors",
       credentials: "omit",
     }).then((r) =>
       r.ok
-        ? setProgress("История Асгард сохранена")
-        : setProgress("Чтото не так при сохранении истории Асгарда")
+        ? toast.success("История Асгард сохранена")
+        : toast.error("Чтото не так при сохранении истории Асгарда")
     );
   }
 }
@@ -252,19 +261,17 @@ const isChecked = (key) => {
 };
 
 function runPlugins() {
-  
-  import("./ResourceLoader.js")
-  .then(m => {
+  import("./ResourceLoader.js").then((m) => {
     let l = new m.default(NXFlashVars);
     l.load([
       { key: "hero_icons_only/hero_icons_only.xml" },
-      
+
       { key: "js/gui/dialog_basic.rsx" },
       { key: "js/gui/titan_artifact_icons.rsx" },
       { key: "js/gui/dialog_season_adventure_tiles.rsx" },
       { key: "js/gui/dialog_season_adventure_tiles_new.rsx" },
       { key: "js/gui/pet_gear.rsx" },
-      
+
       { key: "js/titan_icons/titan_icons.rsx" },
       { key: "js/pet_icons/pet_icons.rsx" },
       { key: "js/team_flags/team_flag_icons.rsx" },
@@ -277,21 +284,20 @@ function runPlugins() {
       { key: "inventory_icons/consumable.xml" },
 
       { key: "quest_icons/quest_icons.xml" },
-      { key: "quest_icons2/quest_icons2.xml" }
-    ])
-    .then(p => {
+      { key: "quest_icons2/quest_icons2.xml" },
+    ]).then((p) => {
       window.XXX = p;
-      import("./plugins/stata.js").then(m => m.default(p));
-      import("./plugins/island.js").then(m => m.default(p));
+      import("./plugins/stata.js").then((m) => m.default(p));
+      import("./plugins/island.js").then((m) => m.default(p));
       //import("./plugins/fixAsgardBattle.js").then(m => m.default(p));
       //import("./plugins/slaveFixBattle.js").then(m => m.default(p));
       //import("./plugins/InvasionAutoBoss.js").then(m => m.default(p));
       //import("./plugins/battlePassRewards.js").then(m => m.default(p));
-      import("./plugins/SavePacks.js").then(m => m.default(p));
+      import("./plugins/SavePacks.js").then((m) => m.default(p));
     });
   });
-  
-  import("./plugins/Events.js").then(m => m.default());
-  import("./plugins/AutoMission.js").then(m => m.default());
-  import("./plugins/testToast.js").then(m => m.default());
+
+  import("./plugins/Events.js").then((m) => m.default());
+  import("./plugins/AutoMission.js").then((m) => m.default());
+  import("./plugins/testToast.js").then((m) => m.default());
 }

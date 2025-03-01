@@ -159,17 +159,22 @@ const onclick = async (e) => {
         .some((el) => !!el.processed);
 
       if (!h?.processed && !!h?.reward?.length && near) {
-        /*await Send({
-          calls: [
-            {
-              name: "seasonAdventure_processLevel",
-              args: { seasonAdventureId: a.id, levelId: h.level },
-              ident: "body",
-            },
-          ],
-        });
-        */
-        console.info("Call", { seasonAdventureId: a.id, levelId: h.level });
+        const call = {
+          name: "seasonAdventure_exploreLevel",
+          args: { seasonAdventureId: a.id, levelId: h.level },
+          ident: "body",
+        };
+        console.info("Call", call);
+        let res = await Send({ calls: [call] });
+        console.info("Call explore result", res);
+        if (res?.error) {
+          console.info("Call explore error", res.error);
+        } else {
+          h.processed = true;
+          call.name = "seasonAdventure_processLevel";
+          res = await Send({ calls: [call] });
+          console.info("Call process result", res);
+        }
       }
     }
   };
@@ -212,7 +217,7 @@ class A {
       processed: processed[el.level],
       tile: el.clientData.graphics.tile,
       visible: el.clientData.graphics.visible[0],
-      reward: el.steps
+      reward: (el?.steps ?? [])
         .map((s) =>
           Object.keys(s.reward).map((r) =>
             !Object.keys(s.reward[r]).length
@@ -317,10 +322,15 @@ class A {
           value,
           item,
           fragment = false;
-        if (["starmoney", "gold"].includes(type)) {
+        if (["starmoney", "gold", "stamina"].includes(type)) {
           item = Object.values(this.loader.lib.inventoryItem.pseudo).find(
-            (e) => e.constName === type.toUpperCase() || e.constName === "COIN"
+            (e) => e.constName === type.toUpperCase()
           );
+          if (!item) {
+            item = Object.values(this.loader.lib.inventoryItem.pseudo).find(
+              (e) => e.constName === "COIN"
+            );
+          }
           value = v;
           im = this.loader.cachedImages.get(
             `${this.loader.lib.asset.inventory[item?.assetAtlas].atlas}/${
@@ -332,26 +342,29 @@ class A {
             fragment = true;
             type = type.toLowerCase().replace("fragment", "");
           }
-          [id, value] = Object.entries(v)[0];
-          const items = this.loader.lib.inventoryItem[type];
-          item = !!items && id in items ? items[id] : null;
+          let k = Object.entries(v);
+          if (k.length >= 1) {
+            [id, value] = k[0];
+            const items = this.loader.lib.inventoryItem[type];
+            item = !!items && id in items ? items[id] : null;
 
-          if (!!item) {
-            im = this.loader.cachedImages.get(
-              `${this.loader.lib.asset.inventory[item?.assetAtlas].atlas}/${
-                item?.assetTexture
-              }`
-            );
-          }
+            if (!!item) {
+              im = this.loader.cachedImages.get(
+                `${this.loader.lib.asset.inventory[item?.assetAtlas].atlas}/${
+                  item?.assetTexture
+                }`
+              );
+            }
 
-          if (type === "petGear") {
-            im = this.loader.cachedImages.get(
-              `pet_gear.rsx/${item?.assetTexture}`
-            );
-          } else if (type === "banner") {
-            im = this.loader.cachedImages.get(
-              `banner_icons.rsx/${item?.assetTexture}`
-            );
+            if (type === "petGear") {
+              im = this.loader.cachedImages.get(
+                `pet_gear.rsx/${item?.assetTexture}`
+              );
+            } else if (type === "banner") {
+              im = this.loader.cachedImages.get(
+                `banner_icons.rsx/${item?.assetTexture}`
+              );
+            }
           }
         }
         if (!!im) {
